@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Clicker Game</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for a clean, centered game experience */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #e2e8f0; /* Slate 200 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Styling for the main click button */
+        #clicker-button {
+            transition: all 0.1s ease-out;
+            transform: scale(1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        #clicker-button:active {
+            transform: scale(0.98);
+            box-shadow: 0 5px 10px -3px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Custom scrollbar for the upgrades panel */
+        .upgrade-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        .upgrade-list::-webkit-scrollbar-track {
+            background: #1e293b; /* Slate 800 */
+            border-radius: 10px;
+        }
+        .upgrade-list::-webkit-scrollbar-thumb {
+            background: #475569; /* Slate 600 */
+            border-radius: 10px;
+        }
+        .upgrade-list::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* Slate 500 */
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="w-full max-w-6xl flex flex-col md:flex-row bg-slate-800 rounded-xl shadow-2xl overflow-hidden min-h-[700px]">
+
+    <!-- Left Half: Clicker Area -->
+    <div id="clicker-area" class="w-full md:w-1/2 flex flex-col items-center justify-center p-8 bg-slate-900 border-r border-slate-700">
+        <h1 class="text-5xl font-extrabold text-indigo-400 mb-6 tracking-tight">CRYPTO CLICKER</h1>
+        <p class="text-4xl font-mono mb-12">
+            <span id="clicks-display" class="text-green-400">0</span> <span class="text-xl">Clicks</span>
+        </p>
+
+        <button id="clicker-button" class="w-64 h-64 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-full text-2xl transition duration-150 ease-in-out">
+            Mine!
+        </button>
+
+        <p class="mt-8 text-lg text-slate-400">
+            Click Power: <span id="cpc-display">1</span>
+        </p>
+    </div>
+
+    <!-- Right Half: Stats and Upgrades Area -->
+    <div id="upgrades-area" class="w-full md:w-1/2 flex flex-col p-8 bg-slate-800">
+        <h2 class="text-3xl font-bold text-sky-400 mb-6 border-b border-slate-700 pb-3">Upgrades & Stats</h2>
+
+        <!-- Stats Panel -->
+        <div class="mb-8 p-4 bg-slate-700 rounded-lg shadow-inner">
+            <h3 class="text-xl font-semibold mb-3 text-white">Current Stats</h3>
+            <div class="text-sm space-y-2">
+                <p>Clicks Per Second (CPS): <span id="cps-display" class="font-mono text-amber-400">0</span></p>
+                <p>User ID (for co-op): <span id="user-id-display" class="font-mono text-xs break-all text-slate-300">Loading...</span></p>
+                <p class="text-xs text-slate-500 italic">Game state is saved automatically to Firestore.</p>
+            </div>
+        </div>
+
+        <!-- Upgrades List -->
+        <div class="upgrade-list flex-1 overflow-y-auto pr-2">
+            <h3 class="text-xl font-semibold mb-4 text-white">Available Upgrades</h3>
+
+            <!-- Single Upgrade Baseline -->
+            <div id="upgrade-panel-1" class="upgrade-item bg-slate-700 p-4 rounded-xl shadow-lg flex justify-between items-center mb-4 border border-slate-600">
+                <div class="flex-grow">
+                    <p class="text-lg font-bold text-emerald-400">CPU Overclock</p>
+                    <p class="text-sm text-slate-400">Increases clicks per manual click (CPC) by 1.</p>
+                    <p class="text-xs text-slate-400 mt-1">Level: <span id="upgrade-level-1">0</span></p>
+                </div>
+                <button id="buy-upgrade-1" class="ml-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-full text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                    Buy (<span id="upgrade-cost-1">10</span>)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Firebase SDK Imports (MUST be in the HTML file) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // IMPORTANT: Canvas Environment Variables (MANDATORY)
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'clicker-game-default-id';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+    // Set Firebase Debug Logging
+    setLogLevel('error'); // Set to 'debug' if troubleshooting
+
+    // --- Core Game State & Firebase Setup ---
+    let db, auth;
+    let userId = null;
+    let isAuthReady = false;
+
+    // Default Game State
+    let gameState = {
+        clicks: 0,
+        cpc: 1, // Clicks Per Click
+        upgrades: {
+            cpuOverclock: {
+                level: 0,
+                baseCost: 10,
+                costMultiplier: 1.5,
+                cpcBonus: 1
+            }
+        }
+    };
+
+    // DOM Elements
+    const clicksDisplay = document.getElementById('clicks-display');
+    const cpcDisplay = document.getElementById('cpc-display');
+    const buyUpgrade1Button = document.getElementById('buy-upgrade-1');
+    const upgradeCost1Display = document.getElementById('upgrade-cost-1');
+    const upgradeLevel1Display = document.getElementById('upgrade-level-1');
+    const clickerButton = document.getElementById('clicker-button');
+    const userIdDisplay = document.getElementById('user-id-display');
+
+    /**
+     * Calculates the cost of the next upgrade level.
+     * @param {number} baseCost
+     * @param {number} multiplier
+     * @param {number} currentLevel
+     * @returns {number}
+     */
+    function calculateCost(baseCost, multiplier, currentLevel) {
+        return Math.floor(baseCost * Math.pow(multiplier, currentLevel));
+    }
+
+    /**
+     * Renders the game state to the UI.
+     */
+    function renderUI() {
+        clicksDisplay.textContent = gameState.clicks.toLocaleString();
+        cpcDisplay.textContent = gameState.cpc.toLocaleString();
+        userIdDisplay.textContent = userId || 'N/A';
+
+        // Render Upgrade 1 (CPU Overclock)
+        const upgrade1 = gameState.upgrades.cpuOverclock;
+        const nextCost = calculateCost(upgrade1.baseCost, upgrade1.costMultiplier, upgrade1.level);
+
+        upgradeCost1Display.textContent = nextCost.toLocaleString();
+        upgradeLevel1Display.textContent = upgrade1.level.toLocaleString();
+
+        // Check if the user can afford the upgrade
+        if (gameState.clicks >= nextCost) {
+            buyUpgrade1Button.disabled = false;
+            buyUpgrade1Button.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+            buyUpgrade1Button.classList.add('bg-green-600', 'hover:bg-green-700');
+        } else {
+            buyUpgrade1Button.disabled = true;
+            buyUpgrade1Button.classList.remove('bg-green-600', 'hover:bg-green-700');
+            buyUpgrade1Button.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+        }
+    }
+
+    /**
+     * Saves the current game state to Firestore.
+     */
+    async function saveGame() {
+        if (!isAuthReady || !userId) {
+            console.error("Authentication not ready. Cannot save game.");
+            return;
+        }
+
+        try {
+            // Define the private data path for the current user
+            const docRef = doc(db, 'artifacts', appId, 'users', userId, 'gameData', 'clickerState');
+            await setDoc(docRef, gameState, { merge: true });
+        } catch (error) {
+            console.error("Error saving game state:", error);
+        }
+    }
+
+    /**
+     * Handles the main click action.
+     */
+    function handleGameClick() {
+        gameState.clicks += gameState.cpc;
+        renderUI();
+        // Throttle saving: save after every 10 clicks to reduce writes.
+        if (gameState.clicks % 10 === 0) {
+             saveGame();
+        }
+    }
+
+    /**
+     * Handles the purchase of the CPU Overclock upgrade.
+     */
+    function handleBuyUpgrade1() {
+        const upgrade1 = gameState.upgrades.cpuOverclock;
+        const cost = calculateCost(upgrade1.baseCost, upgrade1.costMultiplier, upgrade1.level);
+
+        if (gameState.clicks >= cost) {
+            gameState.clicks -= cost;
+            gameState.cpc += upgrade1.cpcBonus;
+            upgrade1.level += 1;
+            renderUI();
+            saveGame(); // Save immediately after a purchase
+        } else {
+            console.warn("Not enough clicks to buy this upgrade!");
+        }
+    }
+
+    /**
+     * Initializes Firebase and sets up the data listener.
+     */
+    async function initializeGame() {
+        if (!firebaseConfig) {
+            console.error("Firebase configuration is missing.");
+            return;
+        }
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            // 1. Handle Authentication
+            if (initialAuthToken) {
+                await signInWithCustomToken(auth, initialAuthToken);
+            } else {
+                await signInAnonymously(auth);
+            }
+
+            // Wait for auth state change to get the definitive userId
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userId = user.uid;
+                    isAuthReady = true;
+                    console.log("User authenticated. ID:", userId);
+                    // 2. Start Real-time Data Listener only after Auth is ready
+                    setupDataListener();
+                } else {
+                    // Fallback for non-authenticated state, though sign-in is attempted above.
+                    userId = crypto.randomUUID();
+                    isAuthReady = true;
+                    // No listener started, game will run with default state, but saving will fail
+                    console.warn("Running in unauthenticated state with local ID.");
+                    renderUI();
+                }
+            });
+
+        } catch (error) {
+            console.error("Firebase initialization or sign-in failed:", error);
+        }
+    }
+
+    /**
+     * Sets up the Firestore real-time listener.
+     */
+    function setupDataListener() {
+        if (!isAuthReady || !userId || !db) return;
+
+        // Path to the user's private game data
+        const docRef = doc(db, 'artifacts', appId, 'users', userId, 'gameData', 'clickerState');
+
+        // Listen for real-time changes
+        onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                // Merge loaded data with the default state to ensure all properties exist
+                gameState.clicks = data.clicks || gameState.clicks;
+                gameState.cpc = data.cpc || gameState.cpc;
+                gameState.upgrades.cpuOverclock.level = data.upgrades?.cpuOverclock?.level || 0;
+
+                console.log("Game state loaded/synced successfully.");
+            } else {
+                console.log("No saved data found. Starting a new game and saving default state.");
+                saveGame(); // Save the initial default state
+            }
+            renderUI(); // Always update UI after loading/syncing
+        }, (error) => {
+            console.error("Error setting up data listener:", error);
+        });
+    }
+
+    // --- Event Listeners ---
+    clickerButton.addEventListener('click', handleGameClick);
+    buyUpgrade1Button.addEventListener('click', handleBuyUpgrade1);
+
+    // Initialize the whole application
+    initializeGame();
+
+</script>
+
+</body>
+</html>
