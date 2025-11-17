@@ -16,4 +16,88 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
    </head>
+   <body>
+
+<div class="w-full max-w-6xl flex flex-col md:flex-row bg-slate-800 rounded-xl shadow-2xl overflow-hidden min-h-[700px]">
+
+    <!-- Left Half: Clicker Area -->
+    <div id="clicker-area" class="w-full md:w-1/2 flex flex-col items-center justify-center p-8 bg-slate-900 border-r border-slate-700">
+        <h1 class="text-5xl font-extrabold text-indigo-400 mb-6 tracking-tight">CRYPTO CLICKER</h1>
+        <p class="text-4xl font-mono mb-12">
+            <span id="clicks-display" class="text-green-400">0</span> <span class="text-xl">Clicks</span>
+        </p>
+
+        <button id="clicker-button" class="w-64 h-64 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-full text-2xl transition duration-150 ease-in-out">
+            Mine!
+        </button>
+
+        <p class="mt-8 text-lg text-slate-400">
+            Click Power: <span id="cpc-display">1</span>
+        </p>
+    </div>
+
+    <!-- Right Half: Stats and Upgrades Area -->
+    <div id="upgrades-area" class="w-full md:w-1/2 flex flex-col p-8 bg-slate-800">
+        <h2 class="text-3xl font-bold text-sky-400 mb-6 border-b border-slate-700 pb-3">Upgrades & Stats</h2>
+
+        <!-- Stats Panel -->
+        <div class="mb-8 p-4 bg-slate-700 rounded-lg shadow-inner">
+            <h3 class="text-xl font-semibold mb-3 text-white">Current Stats</h3>
+            <div class="text-sm space-y-2">
+                <p>Clicks Per Second (CPS): <span id="cps-display" class="font-mono text-amber-400">0</span></p>
+                <p>User ID (for co-op): <span id="user-id-display" class="font-mono text-xs break-all text-slate-300">Loading...</span></p>
+                <p class="text-xs text-slate-500 italic">Game state is saved automatically to Firestore.</p>
+            </div>
+        </div>
+
+        <!-- Upgrades List -->
+        <div class="upgrade-list flex-1 overflow-y-auto pr-2">
+            <h3 class="text-xl font-semibold mb-4 text-white">Available Upgrades</h3>
+
+            <!-- Single Upgrade Baseline -->
+            <div id="upgrade-panel-1" class="upgrade-item bg-slate-700 p-4 rounded-xl shadow-lg flex justify-between items-center mb-4 border border-slate-600">
+                <div class="flex-grow">
+                    <p class="text-lg font-bold text-emerald-400">CPU Overclock</p>
+                    <p class="text-sm text-slate-400">Increases clicks per manual click (CPC) by 1.</p>
+                    <p class="text-xs text-slate-400 mt-1">Level: <span id="upgrade-level-1">0</span></p>
+                </div>
+                <button id="buy-upgrade-1" class="ml-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-full text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                    Buy (<span id="upgrade-cost-1">10</span>)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Firebase SDK Imports and Core App Setup -->
+<script type="module">
+    // These specific imports must stay here because they use full URLs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    
+    // Import the game logic from the external file
+    import { initializeGame } from './script.js'; 
+
+    // IMPORTANT: Canvas Environment Variables (MUST stay here)
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'clicker-game-default-id';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+    // Set Firebase Debug Logging
+    setLogLevel('error');
+
+    // Make the necessary imports and special variables available globally for script.js 
+    // This allows script.js to access them since we can't directly export the special vars.
+    window.firebase = {
+        initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged,
+        getFirestore, doc, setDoc, onSnapshot, setLogLevel,
+        appId, firebaseConfig, initialAuthToken
+    };
+    
+    // Start the game by calling the exported function
+    initializeGame();
+</script>
+
+</body>
+</html>
  </html>
