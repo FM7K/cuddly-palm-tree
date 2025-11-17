@@ -24,15 +24,15 @@ export let gameState = {
     }
 };
 
-// DOM Elements
-const clicksDisplay = document.getElementById('clicks-display');
-const cpcDisplay = document.getElementById('cpc-display');
-const buyUpgrade1Button = document.getElementById('buy-upgrade-1');
-const upgradeCost1Display = document.getElementById('upgrade-cost-1');
-const upgradeLevel1Display = document.getElementById('upgrade-level-1');
-const clickerButton = document.getElementById('clicker-button');
-const userIdDisplay = document.getElementById('user-id-display');
-const cpsDisplay = document.getElementById('cps-display'); 
+// DOM Elements: Declared here, but they will be assigned inside the DOMContentLoaded listener.
+let clicksDisplay;
+let cpcDisplay;
+let buyUpgrade1Button;
+let upgradeCost1Display;
+let upgradeLevel1Display;
+let clickerButton;
+let userIdDisplay;
+let cpsDisplay; 
 
 /**
  * Calculates the cost of the next upgrade level.
@@ -49,6 +49,9 @@ function calculateCost(baseCost, multiplier, currentLevel) {
  * Renders the game state variables (clicks, stats, and upgrade status) to the UI.
  */
 function renderUI() {
+    // Check if elements are available before rendering
+    if (!clicksDisplay) return;
+    
     // Update main stats
     clicksDisplay.textContent = gameState.clicks.toLocaleString();
     cpcDisplay.textContent = gameState.cpc.toLocaleString();
@@ -201,8 +204,19 @@ function setupDataListener() {
 }
 
 // --- Event Listeners ---
-// Note: We attach these inside a DOMContentLoaded listener to ensure the HTML elements exist.
+// CRITICAL FIX: Find DOM elements and attach listeners only after the document is loaded.
 document.addEventListener('DOMContentLoaded', () => {
+    // Assign DOM elements now that the HTML structure is guaranteed to be available
+    clicksDisplay = document.getElementById('clicks-display');
+    cpcDisplay = document.getElementById('cpc-display');
+    buyUpgrade1Button = document.getElementById('buy-upgrade-1');
+    upgradeCost1Display = document.getElementById('upgrade-cost-1');
+    upgradeLevel1Display = document.getElementById('upgrade-level-1');
+    clickerButton = document.getElementById('clicker-button');
+    userIdDisplay = document.getElementById('user-id-display');
+    cpsDisplay = document.getElementById('cps-display');
+    
+    // Attach listeners
     clickerButton.addEventListener('click', handleGameClick);
     buyUpgrade1Button.addEventListener('click', handleBuyUpgrade1);
 });
