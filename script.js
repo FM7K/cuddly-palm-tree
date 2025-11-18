@@ -24,15 +24,17 @@ export let gameState = {
     }
 };
 
-// DOM Elements: Declared here, but they will be assigned inside the DOMContentLoaded listener.
-let clicksDisplay;
-let cpcDisplay;
-let buyUpgrade1Button;
-let upgradeCost1Display;
-let upgradeLevel1Display;
-let clickerButton;
-let userIdDisplay;
-let cpsDisplay; 
+// --- DOM Elements ---
+// CRITICAL FIX: Assign elements directly here. Since the script is loaded 
+// at the very end of the HTML <body>, all these elements should be available.
+const clicksDisplay = document.getElementById('clicks-display');
+const cpcDisplay = document.getElementById('cpc-display');
+const buyUpgrade1Button = document.getElementById('buy-upgrade-1');
+const upgradeCost1Display = document.getElementById('upgrade-cost-1');
+const upgradeLevel1Display = document.getElementById('upgrade-level-1');
+const clickerButton = document.getElementById('clicker-button');
+const userIdDisplay = document.getElementById('user-id-display');
+const cpsDisplay = document.getElementById('cps-display'); 
 
 /**
  * Calculates the cost of the next upgrade level.
@@ -49,8 +51,11 @@ function calculateCost(baseCost, multiplier, currentLevel) {
  * Renders the game state variables (clicks, stats, and upgrade status) to the UI.
  */
 function renderUI() {
-    // Check if elements are available before rendering
-    if (!clicksDisplay) return;
+    // Safety check: ensure elements were found
+    if (!clicksDisplay) {
+        console.error("DOM elements not initialized during renderUI call. Check IDs in index.html.");
+        return;
+    }
     
     // Update main stats
     clicksDisplay.textContent = gameState.clicks.toLocaleString();
@@ -204,19 +209,16 @@ function setupDataListener() {
 }
 
 // --- Event Listeners ---
-// CRITICAL FIX: Find DOM elements and attach listeners only after the document is loaded.
-document.addEventListener('DOMContentLoaded', () => {
-    // Assign DOM elements now that the HTML structure is guaranteed to be available
-    clicksDisplay = document.getElementById('clicks-display');
-    cpcDisplay = document.getElementById('cpc-display');
-    buyUpgrade1Button = document.getElementById('buy-upgrade-1');
-    upgradeCost1Display = document.getElementById('upgrade-cost-1');
-    upgradeLevel1Display = document.getElementById('upgrade-level-1');
-    clickerButton = document.getElementById('clicker-button');
-    userIdDisplay = document.getElementById('user-id-display');
-    cpsDisplay = document.getElementById('cps-display');
-    
-    // Attach listeners
+// CRITICAL FIX: Attach listeners directly. This should ensure they connect immediately 
+// after all HTML and script code is loaded at the end of the body.
+if (clickerButton) {
     clickerButton.addEventListener('click', handleGameClick);
+} else {
+    console.error("Clicker button element was not found in the DOM.");
+}
+
+if (buyUpgrade1Button) {
     buyUpgrade1Button.addEventListener('click', handleBuyUpgrade1);
-});
+} else {
+    console.error("Buy button element was not found in the DOM.");
+}
