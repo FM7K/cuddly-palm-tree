@@ -1,0 +1,386 @@
+<html>
+	<style>
+		/*classes*/
+		p {
+			line-height: 50%;
+			font-weight: normal;
+		}
+		#leftColumn {
+  			float: left;
+  			width: 275px;
+		}
+		#middleColumn {
+  			float: left;
+  			width: 275px;
+ 			margin-left: 60px;
+			margin-top: 50px;
+		}
+		#rightColumn {
+  			float: left;
+  			width: 275px;
+  			margin-left: 1070px;  
+			margin-top: 90px;
+		}
+	</style>
+	<head>
+		<title>Bottles</title>
+	</head>
+	<body>
+		<div id="leftColumn">
+			<h1>Bottles</h1>
+			<h2>You are a water making AI.</h2>
+			<!-- <button type="button" onClick="devCash()">free money for devs</button> -->
+			<button title="Gathers water (no duh)"type="button" onClick="waterClicked(1)">Gather water</button> 
+			<h4>Water gathering</h4>
+			<hr>
+			<p>Gallons of water: <span id="water">0</span></p>
+			<p>Water per second: <span id="wps">0</span></p>
+			<button title="Siphons gater water autonomously." type="button" onClick="buySiphon()">Buy water siphon</button>
+			<p>Siphons: <span id="siphons">0</span></p>
+			<p>Siphon cost: <span id="siphonCost">15</span>$</p>
+			<p>Money: <span id="money">15</span>$</p>
+			<div id="marketingSection">
+				<h4>Marketing</h4>
+				<hr>
+				<button title="Convert water to money" type="button" onClick="starterSell()">Sell water</button>
+				<button title="Marketing sells water autonomously." type="button" onClick="upgradeMarketing()">Upgrade marketing</button>
+				<p>Marketing level: <span id="marketingLevel">1</span></p>
+				<p>Marketing uprade cost: <span id="marketingUpgradeCost">11</span>$</p>
+			</div>
+		</div>
+		<div id="middleColumn">
+			<div id="advTech">
+				<h4>Advanced tech<h4>
+				<hr>
+				<button title="Gain knowledge faster" type="button" onClick="speedLearning()">Increase learning speed</button>
+				<button title="Increase knowledge capacity" type="button" onClick="addStorage()">Increase storage</button>
+					<p>Learning upgrade cost: <span id="learnCost">1000</span>$</p>
+					<p>Storage upgrade cost: <span id="storageCost">300</span>$</p>
+					<p>Knowledge: <span id="knowledge">0</span>/<span id="storage">1000</span></p>
+					<hr>
+					<button id="delete" title="x2 water from siphons" type="button" onClick="getUpgrade()"><span id="upgradeText">Tap into groundwater supply - </span><span id="upgradeCost">1000</span><span id="delete">Kn</span></button>
+					<br>
+					<br>
+					<button id="delete2"title="Marketing is better" type="button" onClick="getUpgrade2()"><span id="upgradeText2">Produce new ads - </span><span id="upgradeCost2">2000</span><span id="delete2">Kn</span></button>
+					<br>
+					<br>
+					<button id="delete3" title="Gives you extra cash" type="button" onClick="getUpgrade3()"><span id="upgradeText3">Develop cheap packaging - </span><span id="upgradeCost3">500</span><span id="delete3">Kn</span></button>
+			</div>
+				<div id="unlockBtn">
+					<button type="button" onClick="unlockAvdTech()">Unlock advanced tech</button>
+					<p>Cost: 200$</p>
+				</div>
+				
+				<div id="expBtn">
+					<button type="button" onClick="unlockexp()">Unlock experience</button>
+					<p>Cost: 2000$</p>
+				</div>
+				<div id="exp">
+				</div>
+				
+				
+		</div>
+	</body>
+	<script>
+		document.getElementById("marketingSection").style.display = "none";
+		document.getElementById("expBtn").style.display = "none";
+		document.getElementById("exp").style.display = "none";
+		document.getElementById("advTech").style.display = "none";
+		document.getElementById("unlockBtn").style.display = "none";
+		const sellTimeout = setTimeout(sellWater, 5000);
+		const knTimeout = setTimeout(increaseKn, 10);
+		const siphonTimeout = setTimeout(siphonWater, 5000);
+		alert('Welcome to Bottles! In this game you make and sell water. Hovering over buttons gives tips. Make sure to read all messages like this one!')
+		
+		var learningSpeed = 1;
+		var water = 0;
+		var wps = 0;
+		var money = 15;
+		var marketingLevel = 0;
+		var waterTotal = 0;
+		var marketingUnlocked = false;
+		var sellTime = 10000;
+		var moneyTotal = 0;
+		var siphons = 0;
+		var siphonsUnlocked = false;
+		var siphonTime = 2000;
+		var advTechUnlocked = false;
+		var unlockBtnDisp = "block";
+		var storage = 1000;
+		var storageBought = false;
+		var storageLevel = 0;
+		var upgrade = 1;
+		var kn = 0;
+		var waterMultiplier = 1.1;
+		var upgrade2 = 1;
+		var upgrade3 = 1;
+		var speedUpgraded = false;
+		
+		//learning speed increase
+		function speedLearning(){
+			if(money >= 1000){
+				learningSpeed += 1;
+				money -= 1000;
+				document.getElementById('money').innerHTML = money;
+			} else {
+				alert('Insufficient funds');
+			}
+		}
+		
+		//upgrades
+		function getUpgrade() {
+			if (upgrade == 1) {
+				if (kn >= 1000) {
+					document.getElementById('upgradeText').innerHTML = 'Locate major aquifers - ';
+					document.getElementById('upgradeCost').innerHTML = '10000';
+					document.getElementById('upgradeText').title = "x2.5 water! wow!";
+					document.getElementById('upgradeCost').title = "x2.5 water! wow!";
+					kn -= 1000;
+					waterMultiplier = 2;
+					document.getElementById('knowledge').innerHTML = kn;
+					upgrade = 2;
+				} else {
+					alert("Insufficient funds")
+				} 
+			} else {
+				if (upgrade == 2) {
+					if (kn >= 10000) {
+						kn -= 10000;
+						watermultiplier = 2.5;
+						document.getElementById('knowledge').innerHTML = kn;
+						document.getElementById('upgradeText').style.display = "none";
+						document.getElementById('upgradeCost').style.display = "none";
+						document.getElementById('delete').style.display = "none";
+						upgrade = 3;
+					} else {
+						alert('Insufficient funds');
+					}
+				}
+			}
+		}
+			
+		function getUpgrade2() {
+			if (upgrade2 == 1) {
+				if (kn >= 2000) {
+					document.getElementById('upgradeText2').innerHTML = 'Create chatchy jingle - ';
+					document.getElementById('upgradeCost2').innerHTML = '7500';
+					document.getElementById('upgradeText2').title = "Gallons sell faster";
+					document.getElementById('upgradeCost2').title = "Gallons sell faster";
+					marketingLevel += 2;
+					document.getElementById('marketingLevel').innerHTML = marketingLevel;
+					kn -= 2000;
+					document.getElementById('knowledge').innerHTML = kn;
+					upgrade2 = 2;
+				} else {
+					alert('Insufficient funds');
+				}
+			} else {
+				if (upgrade2 == 2) {
+					if (kn >= 7500) {
+						sellTime = sellTime * .6;
+						kn -= 7500;
+						document.getElementById('knowledge').innerHTML = kn;
+						document.getElementById('upgradeText2').style.display = "none";
+						document.getElementById('upgradeCost2').style.display = "none";
+						document.getElementById('delete2').style.display = "none";
+						upgrade2 = 3;
+					} else {
+						alert('Insufficient funds');
+					}
+				}
+			}
+		};
+		function getUpgrade3() {
+			if (upgrade3 == 1) {
+				if (kn >= 500) {
+					document.getElementById('upgradeText3').innerHTML = 'Ask for minor budget increase - ';
+					document.getElementById('upgradeCost3').innerHTML = '15000';
+					document.getElementById('upgradeText3').title = "Gives 1000 money.";
+					document.getElementById('upgradeCost3').title = "Gives 1000 money.";
+					money += 500;
+					document.getElementById('money').innerHTML = money;
+					kn -= 500;
+					document.getElementById('knowledge').innerHTML = kn;
+					upgrade3 = 2;
+				} else {
+					alert('Insufficient funds');
+				}
+			} else {
+				if (upgrade3 == 2) {
+					if (kn >= 5000) {
+						money += 1000;
+						document.getElementById('money').innerHTML = money;
+						kn -= 5000;
+						document.getElementById('knowledge').innerHTML = kn;
+						document.getElementById('upgradeText3').style.display = "none";
+						document.getElementById('upgradeCost3').style.display = "none";
+						document.getElementById('delete3').style.display = "none";
+						upgrade3 = 3;
+					} else {
+						alert('Insufficient funds');
+					}
+				}
+			}
+		};
+		
+		//devtools
+		/*
+		function devCash() {
+			money += 1000;
+			moneyTotal += 1000;
+			document.getElementById('money').innerHTML = money;
+		};
+		*/
+		//add storage
+		function addStorage() {
+			if (storageBought = false) {
+				var storageCost = 300;
+			} else {
+				var storageCost = Math.floor(300 * Math.pow(1.1, storageLevel));
+				storageBought = true;
+			};
+			if(money >= storageCost) {
+				storage = storage + 1000;
+				storageLevel = storageLevel + 1;
+				money = money - storageCost;
+				document.getElementById('storage').innerHTML = storage;
+				document.getElementById('storageCost').innerHTML = storageCost;
+				document.getElementById('money').innerHTML = money;
+			} else {
+				alert('Insufficient funds')
+			};
+			var nextstorageCost = 300 + (storageCost / 2);
+			document.getElementById('storageCost').innerHTML = nextStorageCost;
+		};
+		
+		//siphons
+		function buySiphon() {
+			if (siphonsUnlocked = false) {
+				var siphonCost = 15;
+			} else {
+				var siphonCost = Math.floor(15 * Math.pow(1.3, siphons));
+				siphonsUnlocked = true;
+			};
+			if(money >= siphonCost) {
+				siphons = siphons + 1;
+				siphonTime = siphonTime * 0.8;
+				money = money - siphonCost;
+				document.getElementById('siphons').innerHTML = siphons;
+				document.getElementById('siphonCost').innerHTML = siphonCost;
+				document.getElementById('money').innerHTML = money;
+			} else {
+				alert('Insufficient funds')
+			};
+			var nextSiphonCost = Math.floor(15 * Math.pow(1.3, siphons));
+			document.getElementById('siphonCost').innerHTML = nextSiphonCost;
+			if (siphons < 2) {
+				alert('Siphons draw water from a nearby river. As you make more siphons, more water is drawn and water is drawn faster.')
+			};
+		};
+		
+		//siphon collecting
+		function siphonWater() {
+			water = Math.floor(water + siphons * waterMultiplier);
+			document.getElementById('water').innerHTML = water;
+			const siphonTimeout = setTimeout(siphonWater, siphonTime);
+		};
+		
+		//unlock advanced gathering
+		function unlockAvdTech() {
+			if (money >= 200) {
+				unlockBtnDisp = "none";
+				money = money - 200;
+				advGatheringUnlocked = true;
+				document.getElementById('money').innerHTML = money;
+				document.getElementById('unlockBtn').style.display = unlockBtnDisp;
+				document.getElementById('advTech').style.display = "block";
+			} else {
+				alert('Insufficient funds')
+			};
+		};
+		
+		//marketing
+		function upgradeMarketing() {
+			var marketingUpgradeCost = Math.floor(10 * Math.pow(1.5,marketingLevel));
+			if(money >= marketingUpgradeCost) {
+				marketingLevel = marketingLevel + 1;
+				sellTime = sellTime * 0.8;
+				money = money - marketingUpgradeCost;
+				document.getElementById('marketingLevel').innerHTML = marketingLevel;
+				document.getElementById('marketingUpgradeCost').innerHTML = marketingUpgradeCost;
+				document.getElementById('money').innerHTML = money;
+			} else {
+				alert('Insufficient funds')
+			};
+			var nextMarketingUpgradeCost = Math.floor(10 * Math.pow(1.5, marketingLevel));
+			document.getElementById('marketingUpgradeCost').innerHTML = nextMarketingUpgradeCost;
+		};
+		
+		//sells a single water. helps to speed up the process
+		function starterSell(){
+			if (water > 0) {
+				water = water - 1;
+				money = money + 1;
+				moneyTotal = moneyTotal + 1;
+				document.getElementById('water').innerHTML = water;
+				document.getElementById('money').innerHTML = money;
+				if (moneyTotal < 2) {
+					alert('You just sold your first gallon! Selling converts water to cash. Marketing sells water automatically.')
+				};
+			};
+		};
+		
+		//the water click button
+		function waterClicked(amt) {
+			water = water + amt;
+			waterTotal = waterTotal + amt;
+			wps = wps + amt;
+			document.getElementById('water').innerHTML = water;
+		};
+		
+		//the game loop
+		window.setInterval(function gameLoop() {
+			document.getElementById('wps').innerHTML = wps;
+			wps = 0;
+			document.getElementById('money').innerHTML = money;
+			//unlocking marketing
+			if (waterTotal >= 50) {
+				document.getElementById("marketingSection").style.display = "block";
+				marketingUnlocked = true;
+				document.getElementById("unlockBtn").style.display = unlockBtnDisp;
+			};
+			if (kn >= storage){
+				kn = storage;
+				document.getElementById('knowledge').innerHTML = kn;
+			}
+			
+			//for when you complete advanced tech
+			if (upgrade == 3 && upgrade2 == 3 && upgrade3 == 3) {
+				document.getElementById('advTech').style.display = "none";
+				/*
+				document.getElementById('advTech').style.backgroundColor = "#D0D3D4";
+				document.getElementById('advTech').style.borderStyle = "solid";
+				document.getElementById('advTech').style.borderWidth = "thick";
+				document.getElementById('advTech').style.borderColor = "#D0D3D4";
+				*/
+			};
+		}, 1000);
+		
+		function sellWater() {
+			if (water > 2 && marketingUnlocked) {
+				water = water - 3;
+				money = money + 3 + Math.floor(marketingLevel * 1.1);
+				document.getElementById('money').innerHTML = money;
+				document.getElementById('water').innerHTML = water;
+			};
+			const sellTimeout = setTimeout(sellWater, sellTime);
+		};
+		function increaseKn() {
+			if (advTechUnlocked = true && kn < storage) {
+				kn += learningSpeed;
+				document.getElementById('knowledge').innerHTML = kn;
+			}
+		const knTimeout = setTimeout(increaseKn, 50);
+		}
+	</script>
+</html>
