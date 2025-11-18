@@ -25,8 +25,7 @@ export let gameState = {
 };
 
 // --- DOM Elements ---
-// CRITICAL FIX: Assign elements directly here. Since the script is loaded 
-// at the very end of the HTML <body>, all these elements should be available.
+// CRITICAL FIX: We will assign these inside setupEventListeners() to ensure they exist.
 const clicksDisplay = document.getElementById('clicks-display');
 const cpcDisplay = document.getElementById('cpc-display');
 const buyUpgrade1Button = document.getElementById('buy-upgrade-1');
@@ -53,7 +52,8 @@ function calculateCost(baseCost, multiplier, currentLevel) {
 function renderUI() {
     // Safety check: ensure elements were found
     if (!clicksDisplay) {
-        console.error("DOM elements not initialized during renderUI call. Check IDs in index.html.");
+        // If elements aren't found yet, wait for the listener to fire
+        console.warn("Attempted render before DOM elements were fully assigned.");
         return;
     }
     
@@ -137,10 +137,36 @@ function handleBuyUpgrade1() {
 }
 
 /**
+ * Sets up the event listeners for all clickable elements.
+ * CRITICAL FIX: This function now gets called after DOMContentLoaded.
+ */
+function setupEventListeners() {
+    // Re-assigning the constants defined globally, ensuring they are found
+    const clickerButton = document.getElementById('clicker-button');
+    const buyUpgrade1Button = document.getElementById('buy-upgrade-1');
+    
+    if (clickerButton) {
+        clickerButton.addEventListener('click', handleGameClick);
+    } else {
+        console.error("Clicker button element was not found in the DOM.");
+    }
+
+    if (buyUpgrade1Button) {
+        buyUpgrade1Button.addEventListener('click', handleBuyUpgrade1);
+    } else {
+        console.error("Buy button element was not found in the DOM.");
+    }
+}
+
+/**
  * Initializes Firebase and sets up the data listener.
  * This function is exported and called from index.html.
  */
 export async function initializeGame() {
+    // CRITICAL FIX: Ensure event listeners are set up once the DOM is ready.
+    // This resolves the issue of buttons being null when the module script runs.
+    document.addEventListener('DOMContentLoaded', setupEventListeners);
+    
     if (!firebaseConfig) {
         console.error("Firebase configuration is missing.");
         return;
@@ -206,19 +232,4 @@ function setupDataListener() {
     }, (error) => {
         console.error("Error setting up data listener:", error);
     });
-}
-
-// --- Event Listeners ---
-// CRITICAL FIX: Attach listeners directly. This should ensure they connect immediately 
-// after all HTML and script code is loaded at the end of the body.
-if (clickerButton) {
-    clickerButton.addEventListener('click', handleGameClick);
-} else {
-    console.error("Clicker button element was not found in the DOM.");
-}
-
-if (buyUpgrade1Button) {
-    buyUpgrade1Button.addEventListener('click', handleBuyUpgrade1);
-} else {
-    console.error("Buy button element was not found in the DOM.");
 }
