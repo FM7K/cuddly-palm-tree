@@ -11,7 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        /* This ensures the body and html use the full viewport dimensions */
+        /* This ensures the body and html use the full viewport dimensions and removes margins */
         html, body {
             margin: 0;
             padding: 0;
@@ -19,15 +19,15 @@
         }
     </style>
 </head>
-<!-- Removed centering classes and padding to allow for true fullscreen -->
-<body class="bg-slate-900 h-full w-full">
+<!-- Set body background to the same color as the upgrades area (slate-800) -->
+<body class="bg-slate-800 h-full w-full">
 
-<!-- Changed from fixed max-width to full width (w-full) and full screen height (h-screen) -->
-<div class="w-full h-screen flex flex-col md:flex-row bg-slate-800 shadow-none overflow-hidden rounded-none">
+<!-- The main container now also uses bg-slate-800 and takes up the full screen -->
+<div class="w-full h-screen flex flex-col md:flex-row bg-slate-800 shadow-none overflow-hidden">
 
     <!-- Left Half: Clicker Area -->
-    <!-- Changed bg-slate-900 to bg-slate-800 to match the main container but kept the border -->
-    <div id="clicker-area" class="w-full md:w-1/2 flex flex-col items-center justify-center p-8 bg-slate-800 border-r border-slate-700">
+    <!-- This area is set to the darkest color (slate-900) to clearly define the main action zone. -->
+    <div id="clicker-area" class="w-full md:w-1/2 flex flex-col items-center justify-center p-8 bg-slate-900 border-r border-slate-700">
         <h1 class="text-5xl font-extrabold text-indigo-400 mb-6 tracking-tight">CRYPTO CLICKER</h1>
         <p class="text-4xl font-mono mb-12">
             <span id="clicks-display" class="text-green-400">0</span> <span class="text-xl">Clicks</span>
@@ -43,6 +43,7 @@
     </div>
 
     <!-- Right Half: Stats and Upgrades Area -->
+    <!-- This area uses the slightly lighter color (slate-800) -->
     <div id="upgrades-area" class="w-full md:w-1/2 flex flex-col p-8 bg-slate-800">
         <h2 class="text-3xl font-bold text-sky-400 mb-6 border-b border-slate-700 pb-3">Upgrades & Stats </h2>
 
