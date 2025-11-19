@@ -27,7 +27,8 @@ const DEFAULT_GAME_STATE = {
         }
     },
     // Adding a new state for active tab
-    activeTab: 'upgrades' 
+    activeTab: 'upgrades',
+    isAdminUnlocked: false // NEW: Flag for the secret admin panel
 };
 
 let gameState = JSON.parse(JSON.stringify(DEFAULT_GAME_STATE)); // Start with a fresh copy of the default state
@@ -45,7 +46,7 @@ let statsCps = null;
 let statsTotalUpgrades = null;
 let userIdDisplay = null;
 let codeMessageDisplay = null;
-let resetMessageDisplay = null; // New element for reset message
+let resetMessageDisplay = null;
 
 
 /**
@@ -63,6 +64,7 @@ function loadGame() {
             gameState.totalClicksEarned = loadedData.totalClicksEarned || 0; 
             gameState.cpc = loadedData.cpc || 1;
             gameState.activeTab = loadedData.activeTab || 'upgrades'; // Load last active tab
+            gameState.isAdminUnlocked = loadedData.isAdminUnlocked || false; // NEW: Load admin status
             
             Object.keys(gameState.upgrades).forEach(key => {
                 if (loadedData.upgrades && loadedData.upgrades[key]) {
@@ -148,7 +150,7 @@ function gameLoop() {
 
 /**
  * Switches the active tab in the Right Half of the screen.
- * @param {string} tabId The ID of the tab to switch to ('upgrades', 'stats', 'achievements', 'options').
+ * @param {string} tabId The ID of the tab to switch to ('upgrades', 'stats', 'achievements', 'options', 'admin').
  */
 function switchTab(tabId) {
     // 1. Hide all panels and reset button styles
@@ -158,8 +160,11 @@ function switchTab(tabId) {
     });
 
     document.querySelectorAll('.tab-button').forEach(button => {
-        button.classList.remove('bg-slate-800', 'text-sky-400', 'border-sky-400');
-        button.classList.add('text-slate-400', 'border-transparent');
+        // Only target the main four tabs and the admin tab
+        if(button.id !== 'tab-admin' || gameState.isAdminUnlocked) {
+            button.classList.remove('bg-slate-800', 'text-sky-400', 'border-sky-400', 'text-red-400', 'border-red-400');
+            button.classList.add('text-slate-400', 'border-transparent');
+        }
     });
 
     // 2. Show the selected panel and highlight the selected button
@@ -173,8 +178,14 @@ function switchTab(tabId) {
         panel.classList.remove('hidden');
         panel.classList.add('flex'); // Use flex to maintain vertical layout inside the panel
         
-        button.classList.add('bg-slate-800', 'text-sky-400', 'border-sky-400');
-        button.classList.remove('text-slate-400', 'border-transparent');
+        // Custom styling for Admin tab when active
+        if (tabId === 'admin') {
+            button.classList.add('bg-slate-800', 'text-red-400', 'border-red-400');
+            button.classList.remove('text-slate-400', 'border-transparent');
+        } else {
+            button.classList.add('bg-slate-800', 'text-sky-400', 'border-sky-400');
+            button.classList.remove('text-slate-400', 'border-transparent');
+        }
         
         // Update game state
         gameState.activeTab = tabId;
@@ -300,7 +311,24 @@ function handleBuyUpgrade(upgradeId) {
 }
 
 /**
- * Placeholder function for handling code redemption.
+ * Checks the game state and shows/hides the Admin tab accordingly.
+ */
+function checkAdminStatus() {
+    const adminTab = document.getElementById('tab-admin');
+    if (adminTab) {
+        if (gameState.isAdminUnlocked) {
+            adminTab.classList.remove('hidden');
+            adminTab.classList.add('border-r');
+        } else {
+            // Ensure it's hidden if not unlocked (good for first load)
+            adminTab.classList.add('hidden');
+            adminTab.classList.remove('border-r');
+        }
+    }
+}
+
+/**
+ * Handles the code redemption logic.
  */
 function handleRedeemCode() {
     const codeInput = document.getElementById('code-input');
@@ -332,6 +360,31 @@ function handleRedeemCode() {
 
         renderUI();
         saveGame();
+    } else if (code === 'ADMIN') { // NEW LOGIC FOR ADMIN
+        if (gameState.isAdminUnlocked) {
+             if (codeMessageDisplay) {
+                codeMessageDisplay.textContent = 'Admin panel is already unlocked!';
+                codeMessageDisplay.classList.add('text-red-400');
+            }
+        } else {
+            gameState.isAdminUnlocked = true;
+            if (codeMessageDisplay) {
+                codeMessageDisplay.textContent = 'ADMIN panel UNLOCKED! Check the new tab!';
+                codeMessageDisplay.classList.add('text-green-400');
+            }
+            codeInput.value = '';
+            
+            // Show the panel immediately
+            checkAdminStatus();
+
+            console.log(`[Redeem] Code 'ADMIN' successful. Admin panel unlocked.`); 
+
+            // Switch to the Admin tab after unlocking
+            switchTab('admin');
+
+            renderUI();
+            saveGame();
+        }
     } else if (code) {
         if (codeMessageDisplay) {
             codeMessageDisplay.textContent = 'Invalid code. Try again!';
@@ -393,7 +446,7 @@ function setupEventListeners() {
     statsTotalUpgrades = document.getElementById('stats-total-upgrades');
     userIdDisplay = document.getElementById('user-id-display');
     codeMessageDisplay = document.getElementById('code-message');
-    resetMessageDisplay = document.getElementById('reset-message'); // New element reference
+    resetMessageDisplay = document.getElementById('reset-message'); 
 
 
     // 2. Attach listeners
@@ -423,6 +476,9 @@ function setupEventListeners() {
     // Initial calculations and render
     updateCPS();
     
+    // NEW: Check if the Admin tab should be visible right after loading
+    checkAdminStatus();
+
     // Switch to the last active tab or default to 'upgrades'
     switchTab(gameState.activeTab); 
 
