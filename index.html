@@ -29,9 +29,9 @@
     <!-- TOP HEADER -->
     <header class="h-24 flex justify-between items-stretch border-b border-slate-700 bg-slate-900">
         <!-- Header Left: Game Title -->
-        <!-- Removed border-r from this div for a cleaner look next to the tabs -->
         <div id="header-title-area" class="w-full md:w-1/2 flex items-center p-4">
-            <h1 class="text-4xl font-extrabold text-indigo-400 tracking-wider pl-4">CRYPTO CLICKER</h1>
+            <!-- ADDED ID HERE: Game title will be updated by JS -->
+            <h1 id="game-title" class="text-4xl font-extrabold text-indigo-400 tracking-wider pl-4">CRYPTO CLICKER</h1>
         </div>
 
         <!-- Header Right: Tabs (Updated with simplified styling) -->
@@ -80,12 +80,14 @@
         <div id="tab-content-area" class="w-full md:w-1/2 flex flex-col bg-slate-800 p-6 overflow-y-auto">
 
             <!-- TAB PANEL 1: UPGRADES (Default View) -->
+            <!-- The content and names of these will be dynamically changed by JS -->
             <div id="panel-upgrades" class="tab-panel flex flex-col">
                 <h2 class="text-3xl font-bold text-sky-400 mb-6 border-b border-slate-700 pb-3">Available Upgrades</h2>
 
-                <!-- Upgrade 1: CPU Overclock (CPC) -->
+                <!-- Upgrade 1: CPC Upgrade -->
                 <div id="upgrade-panel-1" class="upgrade-item bg-slate-700 p-4 rounded-xl shadow-lg flex justify-between items-center mb-4 border border-slate-600">
-                    <div class="flex-grow">
+                    <div class="flex-grow" id="upgrade-1-details">
+                        <!-- Default Crypto Text (Will be overwritten by JS when in Pencil Mode) -->
                         <p class="text-lg font-bold text-emerald-400">CPU Overclock</p>
                         <p class="text-sm text-slate-400">Increases clicks per manual click (CPC) by 1.</p>
                         <p class="text-xs text-slate-400 mt-1">Level: <span id="upgrade-level-1">0</span></p>
@@ -95,9 +97,10 @@
                     </button>
                 </div>
                 
-                <!-- Upgrade 2: GPU Miner (CPS) -->
+                <!-- Upgrade 2: CPS Upgrade -->
                 <div id="upgrade-panel-2" class="upgrade-item bg-slate-700 p-4 rounded-xl shadow-lg flex justify-between items-center mb-4 border border-slate-600">
-                    <div class="flex-grow">
+                    <div class="flex-grow" id="upgrade-2-details">
+                        <!-- Default Crypto Text (Will be overwritten by JS when in Pencil Mode) -->
                         <p class="text-lg font-bold text-yellow-400">GPU Miner</p>
                         <p class="text-sm text-slate-400">Adds 5 clicks per second (CPS).</p>
                         <p class="text-xs text-slate-400 mt-1">Level: <span id="upgrade-level-2">0</span></p>
@@ -109,7 +112,6 @@
             </div>
 
             <!-- TAB PANEL 2: STATS (Hidden by default) -->
-            <!-- The main stats display is moved here -->
             <div id="panel-stats" class="tab-panel hidden flex flex-col">
                 <h2 class="text-3xl font-bold text-sky-400 mb-6 border-b border-slate-700 pb-3">Detailed Statistics</h2>
                 <div class="space-y-4 text-xl text-slate-300">
@@ -130,6 +132,16 @@
             <!-- TAB PANEL 4: OPTIONS (Hidden by default) -->
             <div id="panel-options" class="tab-panel hidden flex flex-col space-y-6">
                 <h2 class="text-3xl font-bold text-sky-400 border-b border-slate-700 pb-3">Options</h2>
+                
+                <!-- START: New Mode Switch Area (Initially hidden, only shown in Pencil Mode) -->
+                <div id="mode-switch-area" class="bg-slate-700 p-6 rounded-xl shadow-lg border border-slate-600 hidden">
+                    <p class="text-lg font-bold text-indigo-400 mb-3">Game Mode Switch</p>
+                    <p class="text-sm text-slate-400 mb-4">You are currently playing <span id="current-mode-display" class="font-bold">Pencil Clicker</span>. Switch back to the original game mode.</p>
+                    <button id="switch-to-crypto-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition">
+                        Switch to Crypto Clicker
+                    </button>
+                </div>
+                <!-- END: New Mode Switch Area -->
                 
                 <!-- Code Input Area -->
                 <div class="bg-slate-700 p-6 rounded-xl shadow-lg border border-slate-600">
