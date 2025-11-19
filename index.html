@@ -29,12 +29,14 @@
     <!-- TOP HEADER -->
     <header class="h-24 flex justify-between items-stretch border-b border-slate-700 bg-slate-900">
         <!-- Header Left: Game Title -->
-        <div id="header-title-area" class="w-full md:w-1/2 flex items-center p-4 border-r border-slate-700">
+        <!-- Removed border-r from this div for a cleaner look next to the tabs -->
+        <div id="header-title-area" class="w-full md:w-1/2 flex items-center p-4">
             <h1 class="text-4xl font-extrabold text-indigo-400 tracking-wider pl-4">CRYPTO CLICKER</h1>
         </div>
 
-        <!-- Header Right: Tabs -->
-        <nav id="header-tabs-area" class="w-full md:w-1/2 flex items-stretch">
+        <!-- Header Right: Tabs (Updated with simplified styling) -->
+        <nav id="header-tabs-area" class="w-full md:w-1/2 flex items-stretch border-l border-slate-700">
+            <!-- All buttons now share the same base styling and rely on JS to set the active state -->
             <button data-tab="upgrades" id="tab-upgrades" class="tab-button flex-1 px-4 text-center text-lg font-bold transition duration-150 text-slate-400 border-b-2 border-transparent hover:bg-slate-700">
                 Upgrades
             </button>
@@ -47,7 +49,7 @@
             <button data-tab="options" id="tab-options" class="tab-button flex-1 px-4 text-center text-lg font-bold transition duration-150 text-slate-400 border-b-2 border-transparent hover:bg-slate-700">
                 Options
             </button>
-             <!-- START: New Admin Tab (Hidden by Default) -->
+            <!-- START: New Admin Tab (Hidden by Default) -->
             <button data-tab="admin" id="tab-admin" class="tab-button flex-1 px-4 text-center text-lg font-bold transition duration-150 text-slate-400 border-b-2 border-transparent hover:bg-slate-700 hidden">
                 Admin
             </button>
@@ -70,7 +72,7 @@
             </button>
 
             <p class="mt-8 text-lg text-slate-400">
-                Click Power (CP): <span id="cpc-display">1</span>
+                Click Power (CPC): <span id="cpc-display">1</span>
             </p>
         </div>
 
@@ -157,10 +159,66 @@
             <!-- TAB PANEL 5: ADMIN (Hidden by default) -->
             <div id="panel-admin" class="tab-panel hidden flex flex-col space-y-6">
                 <h2 class="text-3xl font-bold text-red-400 border-b border-slate-700 pb-3">ADMIN TOOLS</h2>
-                <p class="text-lg text-slate-300">Welcome, Administrator. This panel is permanently unlocked!</p>
+                <p class="text-lg text-slate-300">Welcome, Administrator. Directly manipulate game variables here. (Must enter a number, minimum 0.)</p>
+
+                <!-- Admin Tool Group 1: Set Clicks -->
                 <div class="bg-slate-700 p-6 rounded-xl shadow-lg border border-slate-600">
-                    <p class="text-xl font-bold text-red-300 mb-3">Placeholder</p>
-                    <p class="text-sm text-slate-400">We'll add your super-secret debug tools here next!</p>
+                    <p class="text-xl font-bold text-red-300 mb-3">Set Clicks (Current: <span id="admin-current-clicks">0</span>)</p>
+                    <div class="flex space-x-3">
+                        <input type="number" min="0" id="admin-input-clicks" placeholder="Enter new click amount..." class="flex-grow p-2 rounded bg-slate-800 text-white border border-slate-600 focus:outline-none focus:ring-2 focus:ring-red-500" value="0">
+                        <button id="admin-btn-set-clicks" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">
+                            Set Clicks
+                        </button>
+                    </div>
+                    <p id="admin-msg-clicks" class="mt-3 text-sm italic text-slate-400"></p>
+                </div>
+
+                <!-- Admin Tool Group 2: Set Click Power (CPC) - Independent -->
+                <div class="bg-slate-700 p-6 rounded-xl shadow-lg border border-slate-600">
+                    <p class="text-xl font-bold text-red-300 mb-3">Set Click Power (CPC) <span class="text-sm text-slate-400">(Overrides upgrade calculation!)</span> (Current: <span id="admin-current-cpc">1</span>)</p>
+                    <div class="flex space-x-3">
+                        <input type="number" min="1" id="admin-input-cpc" placeholder="Enter new CPC value..." class="flex-grow p-2 rounded bg-slate-800 text-white border border-slate-600 focus:outline-none focus:ring-2 focus:ring-red-500" value="1">
+                        <button id="admin-btn-set-cpc" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">
+                            Set CPC
+                        </button>
+                    </div>
+                    <p id="admin-msg-cpc" class="mt-3 text-sm italic text-slate-400"></p>
+                </div>
+
+                <!-- Admin Tool Group 3: Set Clicks Per Second (CPS) - Independent -->
+                <div class="bg-slate-700 p-6 rounded-xl shadow-lg border border-slate-600">
+                    <p class="text-xl font-bold text-red-300 mb-3">Set Clicks Per Second (CPS) <span class="text-sm text-slate-400">(Overrides upgrade calculation!)</span> (Current: <span id="admin-current-cps">0</span>)</p>
+                    <div class="flex space-x-3">
+                        <input type="number" min="0" id="admin-input-cps" placeholder="Enter new CPS value..." class="flex-grow p-2 rounded bg-slate-800 text-white border border-slate-600 focus:outline-none focus:ring-2 focus:ring-red-500" value="0">
+                        <button id="admin-btn-set-cps" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">
+                            Set CPS
+                        </button>
+                    </div>
+                    <p id="admin-msg-cps" class="mt-3 text-sm italic text-slate-400"></p>
+                </div>
+
+                <!-- Admin Tool Group 4: Set CPU Overclock Level -->
+                <div class="bg-slate-700 p-6 rounded-xl shadow-lg border border-slate-600">
+                    <p class="text-xl font-bold text-red-300 mb-3">Set CPU Overclock Level (Current: <span id="admin-current-cpu-level">0</span>)</p>
+                    <div class="flex space-x-3">
+                        <input type="number" min="0" id="admin-input-cpu-level" placeholder="Enter new CPU level..." class="flex-grow p-2 rounded bg-slate-800 text-white border border-slate-600 focus:outline-none focus:ring-2 focus:ring-red-500" value="0">
+                        <button id="admin-btn-set-cpu-level" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">
+                            Set Level
+                        </button>
+                    </div>
+                    <p id="admin-msg-cpu-level" class="mt-3 text-sm italic text-slate-400"></p>
+                </div>
+
+                <!-- Admin Tool Group 5: Set GPU Miner Level -->
+                <div class="bg-slate-700 p-6 rounded-xl shadow-lg border border-slate-600">
+                    <p class="text-xl font-bold text-red-300 mb-3">Set GPU Miner Level (Current: <span id="admin-current-gpu-level">0</span>)</p>
+                    <div class="flex space-x-3">
+                        <input type="number" min="0" id="admin-input-gpu-level" placeholder="Enter new GPU level..." class="flex-grow p-2 rounded bg-slate-800 text-white border border-slate-600 focus:outline-none focus:ring-2 focus:ring-red-500" value="0">
+                        <button id="admin-btn-set-gpu-level" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">
+                            Set Level
+                        </button>
+                    </div>
+                    <p id="admin-msg-gpu-level" class="mt-3 text-sm italic text-slate-400"></p>
                 </div>
             </div>
 
