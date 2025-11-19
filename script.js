@@ -45,6 +45,7 @@ let statsCps = null;
 let statsTotalUpgrades = null;
 let userIdDisplay = null;
 let codeMessageDisplay = null;
+let resetMessageDisplay = null; // New element for reset message
 
 
 /**
@@ -348,6 +349,32 @@ function handleRedeemCode() {
     }
 }
 
+/**
+ * Resets the entire game state by clearing localStorage and reloading the game.
+ */
+function handleResetGame() {
+    // 1. Clear the entire saved state from localStorage
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
+    
+    // 2. Reset the current game state to defaults
+    gameState = JSON.parse(JSON.stringify(DEFAULT_GAME_STATE)); 
+    
+    // 3. Update the display message
+    if (resetMessageDisplay) {
+        resetMessageDisplay.classList.remove('text-red-400');
+        resetMessageDisplay.classList.add('text-yellow-400');
+        resetMessageDisplay.textContent = 'Game data successfully reset! Refreshing the page...';
+    }
+
+    // --- DEBUG LOGGING ---
+    console.warn("[Reset] All game data cleared from localStorage. Restarting game in 2 seconds.");
+
+    // 4. Force a full page reload to properly reinitialize everything
+    setTimeout(() => {
+        window.location.reload();
+    }, 2000);
+}
+
 
 /**
  * Sets up the event listeners and finds all DOM elements.
@@ -359,13 +386,14 @@ function setupEventListeners() {
     cpcDisplay = document.getElementById('cpc-display');
     clickerButton = document.getElementById('clicker-button');
     
-    // Stats Panel references (Moved assignment to the start for better clarity)
+    // Panel references
     statsTotalClicks = document.getElementById('stats-total-clicks');
     statsCpc = document.getElementById('stats-cpc');
     statsCps = document.getElementById('stats-cps');
     statsTotalUpgrades = document.getElementById('stats-total-upgrades');
     userIdDisplay = document.getElementById('user-id-display');
     codeMessageDisplay = document.getElementById('code-message');
+    resetMessageDisplay = document.getElementById('reset-message'); // New element reference
 
 
     // 2. Attach listeners
@@ -374,7 +402,6 @@ function setupEventListeners() {
     }
     
     // Attach listeners for dynamic upgrade purchase buttons
-    // Using ?. for robustness since these are optional/dynamic UI elements
     document.getElementById('buy-upgrade-1')?.addEventListener('click', () => handleBuyUpgrade('cpuOverclock'));
     document.getElementById('buy-upgrade-2')?.addEventListener('click', () => handleBuyUpgrade('gpuMiner'));
     
@@ -388,6 +415,10 @@ function setupEventListeners() {
 
     // Attach listener for the Redeem Code button
     document.getElementById('redeem-code-button')?.addEventListener('click', handleRedeemCode);
+    
+    // Attach listener for the new Reset Data button
+    document.getElementById('reset-data-button')?.addEventListener('click', handleResetGame);
+
 
     // Initial calculations and render
     updateCPS();
