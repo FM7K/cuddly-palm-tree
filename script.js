@@ -33,12 +33,12 @@ const DEFAULT_GAME_STATE = {
 let gameState = JSON.parse(JSON.stringify(DEFAULT_GAME_STATE)); // Start with a fresh copy of the default state
 
 // --- DOM Element Declarations ---
+// Keeping global references for performance/convenience, but adding null checks in renderUI
 let clicksDisplay = null;
 let cpcDisplay = null;
 let clickerButton = null;
-let buyUpgrade1Button = null;
 
-// New DOM elements for the Stats panel
+// New DOM elements for the Stats panel and other UI
 let statsTotalClicks = null;
 let statsCpc = null;
 let statsCps = null;
@@ -178,41 +178,51 @@ function switchTab(tabId) {
 
 /**
  * Renders the game state variables (clicks, stats, and upgrade status) to the UI.
+ * NOTE: Added null checks to prevent errors if elements aren't immediately available.
  */
 function renderUI() {
-    // Safety check: ensure elements were found and assigned by setupEventListeners
-    if (!clicksDisplay || !buyUpgrade1Button) {
-        return;
-    }
     
     const clicksValue = Math.floor(gameState.clicks);
     
     // --- 1. Update Clicker Area and Main Stat Bar (CPC/CPS) ---
-    clicksDisplay.textContent = clicksValue.toLocaleString(); 
-    cpcDisplay.textContent = gameState.cpc.toLocaleString();
+    // Added null checks here
+    if (clicksDisplay) clicksDisplay.textContent = clicksValue.toLocaleString(); 
+    if (cpcDisplay) cpcDisplay.textContent = gameState.cpc.toLocaleString();
 
     // --- 2. Update Stats Panel ---
-    statsTotalClicks.textContent = Math.floor(gameState.totalClicksEarned).toLocaleString();
-    statsCpc.textContent = gameState.cpc.toLocaleString();
-    statsCps.textContent = gameState.cps.toLocaleString();
-    statsTotalUpgrades.textContent = gameState.totalUpgrades.toLocaleString();
-    userIdDisplay.textContent = userId; 
+    // Added null checks here
+    if (statsTotalClicks) statsTotalClicks.textContent = Math.floor(gameState.totalClicksEarned).toLocaleString();
+    if (statsCpc) statsCpc.textContent = gameState.cpc.toLocaleString();
+    if (statsCps) statsCps.textContent = gameState.cps.toLocaleString();
+    if (statsTotalUpgrades) statsTotalUpgrades.textContent = gameState.totalUpgrades.toLocaleString();
+    if (userIdDisplay) userIdDisplay.textContent = userId; 
 
     // --- 3. Update Upgrades Panel ---
 
     // Render Upgrade 1 (CPU Overclock) details
     const upgrade1 = gameState.upgrades.cpuOverclock;
     const nextCost1 = calculateCost(upgrade1.baseCost, upgrade1.costMultiplier, upgrade1.level);
-    document.getElementById('upgrade-cost-1').textContent = nextCost1.toLocaleString();
-    document.getElementById('upgrade-level-1').textContent = upgrade1.level.toLocaleString();
+    
+    // Added null checks for cost and level display
+    const cost1El = document.getElementById('upgrade-cost-1');
+    if (cost1El) cost1El.textContent = nextCost1.toLocaleString();
+
+    const level1El = document.getElementById('upgrade-level-1');
+    if (level1El) level1El.textContent = upgrade1.level.toLocaleString();
 
     // Render Upgrade 2 (GPU Miner) details
     const upgrade2 = gameState.upgrades.gpuMiner;
     const nextCost2 = calculateCost(upgrade2.baseCost, upgrade2.costMultiplier, upgrade2.level);
-    document.getElementById('upgrade-cost-2').textContent = nextCost2.toLocaleString();
-    document.getElementById('upgrade-level-2').textContent = upgrade2.level.toLocaleString();
+
+    // Added null checks for cost and level display
+    const cost2El = document.getElementById('upgrade-cost-2');
+    if (cost2El) cost2El.textContent = nextCost2.toLocaleString();
+
+    const level2El = document.getElementById('upgrade-level-2');
+    if (level2El) level2El.textContent = upgrade2.level.toLocaleString();
     
-    // Get the second button reference
+    // Get button references dynamically for safety, even though event listeners are static.
+    const buyUpgrade1Button = document.getElementById('buy-upgrade-1'); 
     const buyUpgrade2Button = document.getElementById('buy-upgrade-2'); 
 
     // Check and set disability for both buttons
@@ -278,24 +288,37 @@ function handleBuyUpgrade(upgradeId) {
  */
 function handleRedeemCode() {
     const codeInput = document.getElementById('code-input');
+    
+    // Check if input element exists before proceeding
+    if (!codeInput) {
+        console.error("Code input element not found.");
+        return;
+    }
+
     const code = codeInput.value.trim().toUpperCase();
     
-    codeMessageDisplay.classList.remove('text-green-400', 'text-red-400');
+    if (codeMessageDisplay) codeMessageDisplay.classList.remove('text-green-400', 'text-red-400');
     
     if (code === 'BORNTOCODE') {
         gameState.clicks += 5000;
         gameState.totalClicksEarned += 5000;
-        codeMessageDisplay.textContent = 'Code REDEEMED! You gained 5,000 clicks!';
-        codeMessageDisplay.classList.add('text-green-400');
+        if (codeMessageDisplay) {
+            codeMessageDisplay.textContent = 'Code REDEEMED! You gained 5,000 clicks!';
+            codeMessageDisplay.classList.add('text-green-400');
+        }
         codeInput.value = '';
         renderUI();
         saveGame();
     } else if (code) {
-        codeMessageDisplay.textContent = 'Invalid code. Try again!';
-        codeMessageDisplay.classList.add('text-red-400');
+        if (codeMessageDisplay) {
+            codeMessageDisplay.textContent = 'Invalid code. Try again!';
+            codeMessageDisplay.classList.add('text-red-400');
+        }
     } else {
-        codeMessageDisplay.textContent = 'Please enter a code.';
-        codeMessageDisplay.classList.add('text-red-400');
+        if (codeMessageDisplay) {
+            codeMessageDisplay.textContent = 'Please enter a code.';
+            codeMessageDisplay.classList.add('text-red-400');
+        }
     }
 }
 
@@ -305,12 +328,12 @@ function handleRedeemCode() {
  */
 function setupEventListeners() {
     // 1. Assign global DOM variables their element references
+    // Only assigning elements that are guaranteed to be present and used frequently
     clicksDisplay = document.getElementById('clicks-display');
     cpcDisplay = document.getElementById('cpc-display');
     clickerButton = document.getElementById('clicker-button');
-    buyUpgrade1Button = document.getElementById('buy-upgrade-1'); 
     
-    // Stats Panel references
+    // Stats Panel references (Moved assignment to the start for better clarity)
     statsTotalClicks = document.getElementById('stats-total-clicks');
     statsCpc = document.getElementById('stats-cpc');
     statsCps = document.getElementById('stats-cps');
@@ -325,6 +348,7 @@ function setupEventListeners() {
     }
     
     // Attach listeners for dynamic upgrade purchase buttons
+    // Using ?. for robustness since these are optional/dynamic UI elements
     document.getElementById('buy-upgrade-1')?.addEventListener('click', () => handleBuyUpgrade('cpuOverclock'));
     document.getElementById('buy-upgrade-2')?.addEventListener('click', () => handleBuyUpgrade('gpuMiner'));
     
