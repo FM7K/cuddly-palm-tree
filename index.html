@@ -10,13 +10,24 @@
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <style>
+        /* This ensures the body and html use the full viewport dimensions */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+    </style>
 </head>
-<body class="bg-slate-900 flex items-center justify-center min-h-screen p-4">
+<!-- Removed centering classes and padding to allow for true fullscreen -->
+<body class="bg-slate-900 h-full w-full">
 
-<div class="w-full max-w-6xl flex flex-col md:flex-row bg-slate-800 rounded-xl shadow-2xl overflow-hidden min-h-[700px]">
+<!-- Changed from fixed max-width to full width (w-full) and full screen height (h-screen) -->
+<div class="w-full h-screen flex flex-col md:flex-row bg-slate-800 shadow-none overflow-hidden rounded-none">
 
     <!-- Left Half: Clicker Area -->
-    <div id="clicker-area" class="w-full md:w-1/2 flex flex-col items-center justify-center p-8 bg-slate-900 border-r border-slate-700">
+    <!-- Changed bg-slate-900 to bg-slate-800 to match the main container but kept the border -->
+    <div id="clicker-area" class="w-full md:w-1/2 flex flex-col items-center justify-center p-8 bg-slate-800 border-r border-slate-700">
         <h1 class="text-5xl font-extrabold text-indigo-400 mb-6 tracking-tight">CRYPTO CLICKER</h1>
         <p class="text-4xl font-mono mb-12">
             <span id="clicks-display" class="text-green-400">0</span> <span class="text-xl">Clicks</span>
