@@ -69,12 +69,12 @@ function loadGame() {
                 }
             });
             
-            console.log("Game state loaded from localStorage.");
+            console.log("[Load] Game state loaded from localStorage.");
         } else {
-            console.log("No saved game found. Starting new game.");
+            console.log("[Load] No saved game found. Starting new game.");
         }
     } catch (e) {
-        console.error("Error loading game state from localStorage:", e);
+        console.error("[Load] Error loading game state from localStorage:", e);
         // Fallback to default state
         gameState = JSON.parse(JSON.stringify(DEFAULT_GAME_STATE)); 
     }
@@ -90,7 +90,7 @@ function saveGame() {
         localStorage.setItem(LOCAL_STORAGE_KEY, dataToSave);
         // console.log("Game state saved to localStorage.");
     } catch (error) {
-        console.error("Error saving game state:", error);
+        console.error("[Save] Error saving game state:", error);
     }
 }
 
@@ -133,6 +133,9 @@ function gameLoop() {
         gameState.clicks += clicksGained;
         gameState.totalClicksEarned += clicksGained; // Track total earned
         
+        // --- DEBUG LOGGING ---
+        console.log(`[GameLoop] Gained ${clicksGained} clicks from CPS. Total clicks: ${Math.floor(gameState.clicks)}`);
+        
         // Save game state periodically
         if (Math.floor(gameState.clicks) % 5 === 0) { 
             saveGame();
@@ -163,6 +166,9 @@ function switchTab(tabId) {
     const button = document.getElementById(`tab-${tabId}`);
 
     if (panel && button) {
+        // --- DEBUG LOGGING ---
+        console.log(`[TabSwitch] Activating tab: ${tabId}`); 
+
         panel.classList.remove('hidden');
         panel.classList.add('flex'); // Use flex to maintain vertical layout inside the panel
         
@@ -254,6 +260,8 @@ function handleGameClick() {
     gameState.totalClicksEarned += clicksGained; // Track total earned
     renderUI();
     saveGame(); // Save on every manual click
+    // --- DEBUG LOGGING ---
+    console.log(`[Click] Manual click! Gained ${clicksGained} clicks. Total clicks: ${Math.floor(gameState.clicks)}`);
 }
 
 /**
@@ -268,6 +276,9 @@ function handleBuyUpgrade(upgradeId) {
     
     const cost = calculateCost(upgrade.baseCost, upgrade.costMultiplier, upgrade.level);
 
+    // --- DEBUG LOGGING ---
+    console.log(`[Upgrade] Attempting to buy '${upgrade.name}'. Cost: ${cost}. Current Clicks: ${Math.floor(gameState.clicks)}`); 
+
     if (gameState.clicks >= cost) {
         // Deduct cost and apply bonus
         gameState.clicks -= cost;
@@ -275,11 +286,15 @@ function handleBuyUpgrade(upgradeId) {
         
         // Recalculate all derived stats
         updateCPS(); 
+
+        // --- DEBUG LOGGING ---
+        console.log(`[Upgrade] SUCCESS! Bought '${upgrade.name}'. New level: ${upgrade.level}. Clicks remaining: ${Math.floor(gameState.clicks)}.`); 
         
         renderUI();
         saveGame(); // Save immediately after a purchase to ensure it's recorded
     } else {
-        console.warn("Not enough clicks to buy this upgrade!");
+        // --- DEBUG LOGGING ---
+        console.warn(`[Upgrade] FAILED. Not enough clicks (${Math.floor(gameState.clicks)}) to buy upgrade for cost (${cost})!`);
     }
 }
 
@@ -297,6 +312,9 @@ function handleRedeemCode() {
 
     const code = codeInput.value.trim().toUpperCase();
     
+    // --- DEBUG LOGGING ---
+    console.log(`[Redeem] User input: '${code}'`); 
+
     if (codeMessageDisplay) codeMessageDisplay.classList.remove('text-green-400', 'text-red-400');
     
     if (code === 'BORNTOCODE') {
@@ -307,6 +325,10 @@ function handleRedeemCode() {
             codeMessageDisplay.classList.add('text-green-400');
         }
         codeInput.value = '';
+        
+        // --- DEBUG LOGGING ---
+        console.log(`[Redeem] Code 'BORNTOCODE' successful. Gained 5000 clicks. Total clicks: ${Math.floor(gameState.clicks)}`); 
+
         renderUI();
         saveGame();
     } else if (code) {
@@ -314,11 +336,15 @@ function handleRedeemCode() {
             codeMessageDisplay.textContent = 'Invalid code. Try again!';
             codeMessageDisplay.classList.add('text-red-400');
         }
+        // --- DEBUG LOGGING ---
+        console.log(`[Redeem] Code '${code}' failed: Invalid code.`); 
     } else {
         if (codeMessageDisplay) {
             codeMessageDisplay.textContent = 'Please enter a code.';
             codeMessageDisplay.classList.add('text-red-400');
         }
+        // --- DEBUG LOGGING ---
+        console.log(`[Redeem] Failed: No code entered.`); 
     }
 }
 
