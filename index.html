@@ -16,73 +16,126 @@
             margin: 0;
             padding: 0;
             height: 100%;
+            /* Use a monospaced font for a 'digital' feel */
+            font-family: monospace;
         }
     </style>
 </head>
-<!-- Set body background to the same color as the upgrades area (slate-800) -->
 <body class="bg-slate-800 h-full w-full">
 
-<!-- The main container now also uses bg-slate-800 and takes up the full screen -->
-<div class="w-full h-screen flex flex-col md:flex-row bg-slate-800 shadow-none overflow-hidden">
+<!-- Main Full-Screen Container -->
+<div class="w-full h-screen flex flex-col bg-slate-800 overflow-hidden">
 
-    <!-- Left Half: Clicker Area -->
-    <!-- This area is set to the darkest color (slate-900) to clearly define the main action zone. -->
-    <div id="clicker-area" class="w-full md:w-1/2 flex flex-col items-center justify-center p-8 bg-slate-900 border-r border-slate-700">
-        <h1 class="text-5xl font-extrabold text-indigo-400 mb-6 tracking-tight">CRYPTO CLICKER</h1>
-        <p class="text-4xl font-mono mb-12">
-            <span id="clicks-display" class="text-green-400">0</span> <span class="text-xl">Clicks</span>
-        </p>
-
-        <button id="clicker-button" class="w-64 h-64 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold py-4 px-8 rounded-full text-2xl transition duration-150 ease-in-out transform hover:scale-105 active:scale-100 shadow-xl">
-            Mine!
-        </button>
-
-        <p class="mt-8 text-lg text-slate-400">
-            Click Power (CPC): <span id="cpc-display">1</span>
-        </p>
-    </div>
-
-    <!-- Right Half: Stats and Upgrades Area -->
-    <!-- This area uses the slightly lighter color (slate-800) -->
-    <div id="upgrades-area" class="w-full md:w-1/2 flex flex-col p-8 bg-slate-800">
-        <h2 class="text-3xl font-bold text-sky-400 mb-6 border-b border-slate-700 pb-3">Upgrades & Stats </h2>
-
-        <!-- Stats Panel -->
-        <div class="mb-8 p-4 bg-slate-700 rounded-lg shadow-inner">
-            <h3 class="text-xl font-semibold mb-3 text-white">Current Stats</h3>
-            <div class="text-sm space-y-2">
-                <p>Clicks Per Second (CPS): <span id="cps-display" class="font-mono text-amber-400">0</span></p>
-                <p>Local User ID: <span id="user-id-display" class="font-mono text-xs break-all text-slate-300">Loading...</span></p>
-                <p class="text-xs text-slate-500 italic">Game state is saved automatically in your browser using localStorage.</p>
-            </div>
+    <!-- TOP HEADER -->
+    <header class="h-24 flex justify-between items-stretch border-b border-slate-700 bg-slate-900">
+        <!-- Header Left: Game Title -->
+        <div id="header-title-area" class="w-full md:w-1/2 flex items-center p-4 border-r border-slate-700">
+            <h1 class="text-4xl font-extrabold text-indigo-400 tracking-wider pl-4">CRYPTO CLICKER</h1>
         </div>
 
-        <!-- Upgrades List -->
-        <div class="upgrade-list flex-1 overflow-y-auto pr-2">
-            <h3 class="text-xl font-semibold mb-4 text-white">Available Upgrades</h3>
+        <!-- Header Right: Tabs -->
+        <nav id="header-tabs-area" class="w-full md:w-1/2 flex items-stretch">
+            <button data-tab="upgrades" id="tab-upgrades" class="tab-button flex-1 px-4 text-center text-lg font-bold transition duration-150 border-r border-slate-700 bg-slate-800 text-sky-400 border-b-2 border-sky-400 hover:bg-slate-700">
+                Upgrades
+            </button>
+            <button data-tab="stats" id="tab-stats" class="tab-button flex-1 px-4 text-center text-lg font-bold transition duration-150 border-r border-slate-700 text-slate-400 border-b-2 border-transparent hover:bg-slate-700">
+                Stats
+            </button>
+            <button data-tab="achievements" id="tab-achievements" class="tab-button flex-1 px-4 text-center text-lg font-bold transition duration-150 border-r border-slate-700 text-slate-400 border-b-2 border-transparent hover:bg-slate-700">
+                Achievements
+            </button>
+            <button data-tab="options" id="tab-options" class="tab-button flex-1 px-4 text-center text-lg font-bold transition duration-150 text-slate-400 border-b-2 border-transparent hover:bg-slate-700">
+                Options
+            </button>
+        </nav>
+    </header>
 
-            <!-- Upgrade 1: CPU Overclock (CPC) -->
-            <div id="upgrade-panel-1" class="upgrade-item bg-slate-700 p-4 rounded-xl shadow-lg flex justify-between items-center mb-4 border border-slate-600">
-                <div class="flex-grow">
-                    <p class="text-lg font-bold text-emerald-400">CPU Overclock</p>
-                    <p class="text-sm text-slate-400">Increases clicks per manual click (CPC) by 1.</p>
-                    <p class="text-xs text-slate-400 mt-1">Level: <span id="upgrade-level-1">0</span></p>
+    <!-- MAIN GAME CONTENT AREA -->
+    <!-- The main content flex container ensures the two halves fill the remaining vertical space -->
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- Left Half: Clicker Area -->
+        <div id="clicker-area" class="w-full md:w-1/2 flex flex-col items-center justify-center p-8 bg-slate-900 border-r border-slate-700 overflow-y-auto">
+            <p class="text-4xl font-mono mb-12">
+                <span id="clicks-display" class="text-green-400">0</span> <span class="text-xl">Clicks</span>
+            </p>
+
+            <button id="clicker-button" class="w-64 h-64 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold py-4 px-8 rounded-full text-2xl transition duration-150 ease-in-out transform hover:scale-105 active:scale-100 shadow-xl">
+                Mine!
+            </button>
+
+            <p class="mt-8 text-lg text-slate-400">
+                Click Power (CPC): <span id="cpc-display">1</span>
+            </p>
+        </div>
+
+        <!-- Right Half: Tab Content Area -->
+        <div id="tab-content-area" class="w-full md:w-1/2 flex flex-col bg-slate-800 p-6 overflow-y-auto">
+
+            <!-- TAB PANEL 1: UPGRADES (Default View) -->
+            <div id="panel-upgrades" class="tab-panel flex flex-col">
+                <h2 class="text-3xl font-bold text-sky-400 mb-6 border-b border-slate-700 pb-3">Available Upgrades</h2>
+
+                <!-- Upgrade 1: CPU Overclock (CPC) -->
+                <div id="upgrade-panel-1" class="upgrade-item bg-slate-700 p-4 rounded-xl shadow-lg flex justify-between items-center mb-4 border border-slate-600">
+                    <div class="flex-grow">
+                        <p class="text-lg font-bold text-emerald-400">CPU Overclock</p>
+                        <p class="text-sm text-slate-400">Increases clicks per manual click (CPC) by 1.</p>
+                        <p class="text-xs text-slate-400 mt-1">Level: <span id="upgrade-level-1">0</span></p>
+                    </div>
+                    <button id="buy-upgrade-1" class="ml-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-full text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        Buy (<span id="upgrade-cost-1">10</span>)
+                    </button>
                 </div>
-                <button id="buy-upgrade-1" class="ml-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-full text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                    Buy (<span id="upgrade-cost-1">10</span>)
-                </button>
+                
+                <!-- Upgrade 2: GPU Miner (CPS) -->
+                <div id="upgrade-panel-2" class="upgrade-item bg-slate-700 p-4 rounded-xl shadow-lg flex justify-between items-center mb-4 border border-slate-600">
+                    <div class="flex-grow">
+                        <p class="text-lg font-bold text-yellow-400">GPU Miner</p>
+                        <p class="text-sm text-slate-400">Adds 5 clicks per second (CPS).</p>
+                        <p class="text-xs text-slate-400 mt-1">Level: <span id="upgrade-level-2">0</span></p>
+                    </div>
+                    <button id="buy-upgrade-2" class="ml-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-full text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        Buy (<span id="upgrade-cost-2">100</span>)
+                    </button>
+                </div>
             </div>
-            
-            <!-- Upgrade 2: GPU Miner (CPS) -->
-            <div id="upgrade-panel-2" class="upgrade-item bg-slate-700 p-4 rounded-xl shadow-lg flex justify-between items-center mb-4 border border-slate-600">
-                <div class="flex-grow">
-                    <p class="text-lg font-bold text-yellow-400">GPU Miner</p>
-                    <p class="text-sm text-slate-400">Adds 5 clicks per second (CPS).</p>
-                    <p class="text-xs text-slate-400 mt-1">Level: <span id="upgrade-level-2">0</span></p>
+
+            <!-- TAB PANEL 2: STATS (Hidden by default) -->
+            <!-- The main stats display is moved here -->
+            <div id="panel-stats" class="tab-panel hidden flex flex-col">
+                <h2 class="text-3xl font-bold text-sky-400 mb-6 border-b border-slate-700 pb-3">Detailed Statistics</h2>
+                <div class="space-y-4 text-xl text-slate-300">
+                    <p>Total Clicks Earned: <span id="stats-total-clicks" class="font-mono text-green-400">0</span></p>
+                    <p>Click Power (CPC): <span id="stats-cpc" class="font-mono text-emerald-400">1</span></p>
+                    <p>Clicks Per Second (CPS): <span id="stats-cps" class="font-mono text-amber-400">0</span></p>
+                    <p class="pt-4 border-t border-slate-700">Total Upgrades Bought: <span id="stats-total-upgrades" class="font-mono text-indigo-400">0</span></p>
+                    <p class="text-sm text-slate-500 italic">Local User ID: <span id="user-id-display" class="font-mono text-xs break-all">Loading...</span></p>
                 </div>
-                <button id="buy-upgrade-2" class="ml-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-full text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                    Buy (<span id="upgrade-cost-2">100</span>)
-                </button>
+            </div>
+
+            <!-- TAB PANEL 3: ACHIEVEMENTS (Hidden by default) -->
+            <div id="panel-achievements" class="tab-panel hidden flex flex-col">
+                <h2 class="text-3xl font-bold text-sky-400 mb-6 border-b border-slate-700 pb-3">Achievements</h2>
+                <p class="text-slate-400 text-lg">No achievements unlocked yet. Get clicking!</p>
+            </div>
+
+            <!-- TAB PANEL 4: OPTIONS (Hidden by default) -->
+            <div id="panel-options" class="tab-panel hidden flex flex-col">
+                <h2 class="text-3xl font-bold text-sky-400 mb-6 border-b border-slate-700 pb-3">Options</h2>
+                
+                <!-- Code Input Area -->
+                <div class="bg-slate-700 p-6 rounded-xl shadow-lg border border-slate-600">
+                    <p class="text-lg font-bold text-red-400 mb-3">Redeem Code</p>
+                    <p class="text-sm text-slate-400 mb-4">Insert a special secret code here to unlock a bonus.</p>
+                    <div class="flex space-x-3">
+                        <input type="text" id="code-input" placeholder="Enter code here..." class="flex-grow p-2 rounded bg-slate-800 text-white border border-slate-600 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <button id="redeem-code-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            Redeem
+                        </button>
+                    </div>
+                    <p id="code-message" class="mt-3 text-sm italic text-slate-400"></p>
+                </div>
             </div>
 
         </div>
