@@ -44,6 +44,11 @@
             <button data-tab="achievements" id="tab-achievements" class="tab-button flex-1 px-4 text-center text-lg font-bold transition duration-150 border-r border-slate-700 text-slate-400 border-b-2 border-transparent hover:bg-slate-700">
                 Achievements
             </button>
+            <!-- START: New Admin Tab (Hidden by Default) -->
+            <button data-tab="admin" id="tab-admin" class="tab-button flex-1 px-4 text-center text-lg font-bold transition duration-150 border-r border-slate-700 text-red-400 border-b-2 border-transparent hover:bg-slate-700 hidden">
+                Admin
+            </button>
+            <!-- END: New Admin Tab -->
             <button data-tab="options" id="tab-options" class="tab-button flex-1 px-4 text-center text-lg font-bold transition duration-150 text-slate-400 border-b-2 border-transparent hover:bg-slate-700">
                 Options
             </button>
@@ -146,6 +151,16 @@
                     </button>
                     <!-- This is the message display area for the reset confirmation -->
                     <p id="reset-message" class="mt-3 text-sm italic text-slate-400"></p> 
+                </div>
+            </div>
+
+            <!-- TAB PANEL 5: ADMIN (Hidden by default) -->
+            <div id="panel-admin" class="tab-panel hidden flex flex-col space-y-6">
+                <h2 class="text-3xl font-bold text-red-400 border-b border-slate-700 pb-3">ADMIN TOOLS</h2>
+                <p class="text-lg text-slate-300">Welcome, Administrator. This panel is permanently unlocked!</p>
+                <div class="bg-slate-700 p-6 rounded-xl shadow-lg border border-slate-600">
+                    <p class="text-xl font-bold text-red-300 mb-3">Placeholder</p>
+                    <p class="text-sm text-slate-400">We'll add your super-secret debug tools here next!</p>
                 </div>
             </div>
 
