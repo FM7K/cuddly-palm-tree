@@ -192,6 +192,17 @@ function saveGame() {
 }
 
 /**
+ * NEW: Applies the correct theme class to the <body> element based on the current gameMode.
+ */
+function applyTheme() {
+    if (gameMode === 'pencil') {
+        document.body.classList.add('pencil-mode');
+    } else {
+        document.body.classList.remove('pencil-mode');
+    }
+}
+
+/**
  * Switches the entire game environment between Crypto and Pencil mode.
  */
 function switchGameMode(newMode) {
@@ -219,6 +230,7 @@ function switchGameMode(newMode) {
     if (clickerButton) clickerButton.textContent = config.clickButtonText;
 
     // 5. Update UI and logic
+    applyTheme(); // <-- ADDED: Apply the new theme
     checkAdminStatus(); // Check if admin panel is unlocked in the new mode
     updateUpgradeDisplay(); // Update upgrade names/descriptions
     updateCPS(); // Recalculate stats based on new mode's loaded levels
@@ -287,7 +299,7 @@ function gameLoop() {
 
 
 /**
- * Switches the active tab in the Right Half of the screen. (Unchanged logic)
+ * FIXED: Switches the active tab in the Right Half of the screen.
  */
 function switchTab(tabId) {
     // 1. Hide all panels and reset button styles
@@ -297,7 +309,8 @@ function switchTab(tabId) {
     });
 
     document.querySelectorAll('.tab-button').forEach(button => {
-        button.classList.remove('bg-slate-800', 'text-sky-400', 'border-sky-400', 'text-red-400', 'border-red-400');
+        // Remove all possible theme/active colors
+        button.classList.remove('bg-slate-800', 'text-sky-400', 'border-sky-400', 'text-yellow-500', 'border-yellow-500', 'text-red-400', 'border-red-400');
         button.classList.add('text-slate-400', 'border-transparent');
     });
 
@@ -314,9 +327,13 @@ function switchTab(tabId) {
         // Custom styling for active tab
         if (tabId === 'admin') {
             button.classList.add('bg-slate-800', 'text-red-400', 'border-red-400');
-            renderUI(); 
         } else {
-            button.classList.add('bg-slate-800', 'text-sky-400', 'border-sky-400');
+            // Apply theme-specific color
+            if (gameMode === 'pencil') {
+                button.classList.add('bg-slate-800', 'text-yellow-500', 'border-yellow-500');
+            } else {
+                button.classList.add('bg-slate-800', 'text-sky-400', 'border-sky-400');
+            }
         }
         
         // Update game state
@@ -336,24 +353,37 @@ function updateUpgradeDisplay() {
     
     // Update Upgrade 1 (CPC)
     if (upgrade1DetailsEl) {
-        upgrade1DetailsEl.innerHTML = `
-            <p class="text-lg font-bold text-emerald-400">${config.upgrade1.name}</p>
-            <p class="text-sm text-slate-400">${config.upgrade1.description}</p>
-            <p class="text-xs text-slate-400 mt-1">Level: <span id="upgrade-level-1">${gameState.upgrades.cpuOverclock.level}</span></p>
-        `;
-        // Re-assign the span element reference since we rewrote the innerHTML
+        // Find the title element and update it
+        const titleEl = upgrade1DetailsEl.querySelector('.text-lg');
+        if (titleEl) {
+            titleEl.textContent = config.upgrade1.name;
+        }
+        // Find the description element and update it
+        const descEl = upgrade1DetailsEl.querySelector('.text-sm');
+        if (descEl) {
+            descEl.textContent = config.upgrade1.description;
+        }
+        // Find the level element (this is safer than rewriting innerHTML)
         upgradeLevel1El = document.getElementById('upgrade-level-1');
+        if(upgradeLevel1El) {
+             upgradeLevel1El.textContent = gameState.upgrades.cpuOverclock.level;
+        }
     }
 
     // Update Upgrade 2 (CPS)
     if (upgrade2DetailsEl) {
-        upgrade2DetailsEl.innerHTML = `
-            <p class="text-lg font-bold text-yellow-400">${config.upgrade2.name}</p>
-            <p class="text-sm text-slate-400">${config.upgrade2.description}</p>
-            <p class="text-xs text-slate-400 mt-1">Level: <span id="upgrade-level-2">${gameState.upgrades.gpuMiner.level}</span></p>
-        `;
-        // Re-assign the span element reference
+        const titleEl = upgrade2DetailsEl.querySelector('.text-lg');
+        if (titleEl) {
+            titleEl.textContent = config.upgrade2.name;
+        }
+        const descEl = upgrade2DetailsEl.querySelector('.text-sm');
+        if (descEl) {
+            descEl.textContent = config.upgrade2.description;
+        }
         upgradeLevel2El = document.getElementById('upgrade-level-2');
+        if(upgradeLevel2El) {
+            upgradeLevel2El.textContent = gameState.upgrades.gpuMiner.level;
+        }
     }
 }
 
@@ -374,8 +404,12 @@ function renderUI() {
         if (gameMode === 'pencil') {
             modeSwitchArea.classList.remove('hidden');
             if (currentModeDisplay) currentModeDisplay.textContent = 'Pencil Clicker';
+            if (switchToCryptoButton) switchToCryptoButton.textContent = 'Switch to Crypto Clicker';
+
         } else {
             modeSwitchArea.classList.add('hidden');
+            if (currentModeDisplay) currentModeDisplay.textContent = 'Crypto Clicker';
+            if (switchToCryptoButton) switchToCryptoButton.textContent = 'Switch to Pencil Clicker';
         }
     }
 
@@ -409,11 +443,19 @@ function renderUI() {
         if (button) {
             const isAffordable = clicksValue >= cost;
             button.disabled = !isAffordable;
-            // Visual feedback for affordability
-            button.classList.toggle('bg-green-600', isAffordable);
-            button.classList.toggle('hover:bg-green-700', isAffordable);
-            button.classList.toggle('bg-emerald-600', !isAffordable);
-            button.classList.toggle('hover:bg-emerald-700', !isAffordable);
+            
+            // Manage affordable/unaffordable classes (excluding pencil mode classes)
+            if (isAffordable) {
+                if (!document.body.classList.contains('pencil-mode')) {
+                    button.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+                    button.classList.add('bg-green-600', 'hover:bg-green-700');
+                }
+            } else {
+                 if (!document.body.classList.contains('pencil-mode')) {
+                    button.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    button.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+                 }
+            }
         }
     });
     
@@ -452,8 +494,14 @@ function handleGameClick() {
  * Handles the purchase of an upgrade.
  */
 function handleBuyUpgrade(upgradeId) {
-    const upgrade = gameState.upgrades[upgradeId];
-    if (!upgrade) return;
+    // Determine the internal key
+    const upgradeKey = upgradeId === '1' ? 'cpuOverclock' : 'gpuMiner';
+    const upgrade = gameState.upgrades[upgradeKey];
+    
+    if (!upgrade) {
+        console.error("Invalid upgrade key:", upgradeKey);
+        return;
+    }
     
     const cost = calculateCost(upgrade.baseCost, upgrade.costMultiplier, upgrade.level);
 
@@ -462,8 +510,8 @@ function handleBuyUpgrade(upgradeId) {
         upgrade.level += 1;
         
         // Disable admin override when buying an upgrade
-        if (upgradeId === 'cpuOverclock') gameState.isCpcOverridden = false;
-        if (upgradeId === 'gpuMiner') gameState.isCpsOverridden = false;
+        if (upgradeKey === 'cpuOverclock') gameState.isCpcOverridden = false;
+        if (upgradeKey === 'gpuMiner') gameState.isCpsOverridden = false;
         
         updateCPS(); 
 
@@ -498,7 +546,9 @@ function handleRedeemCode() {
 
     const code = codeInput.value.trim().toUpperCase();
     
-    if (codeMessageDisplay) codeMessageDisplay.classList.remove('text-green-400', 'text-red-400');
+    if (codeMessageDisplay) {
+        codeMessageDisplay.classList.remove('text-green-400', 'text-red-400', 'text-yellow-500');
+    }
     
     if (code === 'SECRET') {
         if (gameMode === 'pencil') {
@@ -516,7 +566,6 @@ function handleRedeemCode() {
             codeInput.value = '';
         }
     } else if (code === 'ADMIN') { // Existing Admin Unlock Logic
-        // ... (existing admin logic remains here for completeness) ...
         if (gameState.isAdminUnlocked) {
              if (codeMessageDisplay) {
                 codeMessageDisplay.textContent = 'Admin panel is already unlocked!';
@@ -531,7 +580,7 @@ function handleRedeemCode() {
             codeInput.value = '';
             
             checkAdminStatus();
-            switchTab('admin');
+            switchTab('admin'); // Automatically switch to the admin tab
 
             renderUI();
             saveGame();
@@ -554,7 +603,7 @@ function handleRedeemCode() {
     } else {
         if (codeMessageDisplay) {
             codeMessageDisplay.textContent = 'Please enter a code.';
-            codeMessageDisplay.classList.add('text-red-400');
+            codeMessageDisplay.classList.add('text-yellow-500'); // Use yellow for a warning
         }
     }
 }
@@ -563,11 +612,17 @@ function handleRedeemCode() {
  * Handles the special switch back from Pencil Clicker to Crypto Clicker.
  */
 function handleSwitchToCrypto() {
-    // Only allow switching back if currently in pencil mode
-    if (gameMode === 'pencil') {
-        switchGameMode('crypto');
-        if (codeMessageDisplay) {
+    // This function will just toggle the mode
+    const newMode = gameMode === 'crypto' ? 'pencil' : 'crypto';
+    switchGameMode(newMode);
+
+    if (codeMessageDisplay) {
+        codeMessageDisplay.classList.remove('text-red-400', 'text-green-400');
+        if (newMode === 'crypto') {
             codeMessageDisplay.textContent = 'Welcome back to Crypto Clicker!';
+            codeMessageDisplay.classList.add('text-green-400');
+        } else {
+            codeMessageDisplay.textContent = 'Switched to Pencil Clicker!';
             codeMessageDisplay.classList.add('text-green-400');
         }
     }
@@ -589,6 +644,7 @@ function handleResetGame() {
 
     console.warn("[Reset] All game data cleared. Restarting game in 2 seconds.");
 
+    // Force a full reload to clear all state
     setTimeout(() => {
         window.location.reload();
     }, 2000);
@@ -600,32 +656,58 @@ function validateAdminInput(inputEl, msgEl) {
     if (!inputEl || !msgEl) return null;
     msgEl.textContent = ''; 
     msgEl.classList.remove('text-red-400', 'text-green-400');
+    
+    // Use parseFloat to allow non-integers for clicks/cpc/cps
     const value = parseFloat(inputEl.value);
     const minValue = parseFloat(inputEl.getAttribute('min'));
-    const isLevel = inputEl.id.includes('level');
-    if (isNaN(value) || value < minValue || (isLevel && !Number.isInteger(value))) {
-        msgEl.textContent = `Error: Invalid input. Must be ${isLevel ? 'a whole number' : 'a number'} $\\ge$ ${minValue}.`;
+    const isLevel = inputEl.id.includes('level'); // Check if it's a level input
+
+    // Check for NaN
+    if (isNaN(value)) {
+        msgEl.textContent = 'Error: Input must be a valid number.';
         msgEl.classList.add('text-red-400');
         return null;
     }
-    return isLevel ? Math.floor(value) : value;
+
+    // Check for minimum value
+    if (value < minValue) {
+        msgEl.textContent = `Error: Value must be at least ${minValue}.`;
+        msgEl.classList.add('text-red-400');
+        return null;
+    }
+
+    // If it's a level input, it must be an integer
+    if (isLevel && !Number.isInteger(value)) {
+        msgEl.textContent = 'Error: Level must be a whole number (e.g., 1, 2, 3).';
+        msgEl.classList.add('text-red-400');
+        return null;
+    }
+
+    return value; // Return the validated number
 }
+
 
 function showAdminSuccess(msgEl, message) {
     if (msgEl) {
         msgEl.classList.remove('text-red-400');
         msgEl.classList.add('text-green-400');
         msgEl.textContent = message;
-        setTimeout(() => msgEl.textContent = '', 3000);
+        // Clear message after 3 seconds
+        setTimeout(() => {
+             if(msgEl) msgEl.textContent = '';
+        }, 3000);
     }
 }
 
 function handleAdminSetClicks() {
     const value = validateAdminInput(adminInputClicks, adminMsgClicks);
     if (value !== null) {
-        const diff = value - gameState.clicks;
+        const diff = value - gameState.clicks; // Calculate difference
         gameState.clicks = value;
-        gameState.totalClicksEarned += diff; 
+        // Only add the difference to totalClicksEarned if it's positive
+        if (diff > 0) {
+            gameState.totalClicksEarned += diff; 
+        }
         showAdminSuccess(adminMsgClicks, `Clicks set to ${value.toLocaleString()}.`);
         renderUI();
         saveGame();
@@ -636,7 +718,7 @@ function handleAdminSetCPC() {
     const value = validateAdminInput(adminInputCpc, adminMsgCpc);
     if (value !== null) {
         gameState.cpc = value;
-        gameState.isCpcOverridden = true;
+        gameState.isCpcOverridden = true; // Activate override
         showAdminSuccess(adminMsgCpc, `Click Power (CPC) set to ${value.toLocaleString()}.`);
         renderUI();
         saveGame();
@@ -647,7 +729,7 @@ function handleAdminSetCPS() {
     const value = validateAdminInput(adminInputCps, adminMsgCps);
     if (value !== null) {
         gameState.cps = value;
-        gameState.isCpsOverridden = true;
+        gameState.isCpsOverridden = true; // Activate override
         showAdminSuccess(adminMsgCps, `Clicks Per Second (CPS) set to ${value.toLocaleString()}.`);
         renderUI();
         saveGame();
@@ -658,9 +740,9 @@ function handleAdminSetCpuLevel() {
     const value = validateAdminInput(adminInputCpuLevel, adminMsgCpuLevel);
     if (value !== null) {
         gameState.upgrades.cpuOverclock.level = value;
-        gameState.isCpcOverridden = false; 
-        showAdminSuccess(adminMsgCpuLevel, `CPC Level set to ${value}.`);
-        updateCPS(); 
+        gameState.isCpcOverridden = false; // Deactivate override
+        showAdminSuccess(adminMsgCpuLevel, `CPC Level set to ${value}. Recalculating CPC...`);
+        updateCPS(); // Recalculate stats
         renderUI();
         saveGame();
     }
@@ -670,9 +752,9 @@ function handleAdminSetGpuLevel() {
     const value = validateAdminInput(adminInputGpuLevel, adminMsgGpuLevel);
     if (value !== null) {
         gameState.upgrades.gpuMiner.level = value;
-        gameState.isCpsOverridden = false;
-        showAdminSuccess(adminMsgGpuLevel, `CPS Level set to ${value}.`);
-        updateCPS(); 
+        gameState.isCpsOverridden = false; // Deactivate override
+        showAdminSuccess(adminMsgGpuLevel, `CPS Level set to ${value}. Recalculating CPS...`);
+        updateCPS(); // Recalculate stats
         renderUI();
         saveGame();
     }
@@ -739,8 +821,8 @@ function setupEventListeners() {
     if (clickerButton) clickerButton.addEventListener('click', handleGameClick);
     
     // Upgrade listeners
-    buyUpgrade1Button?.addEventListener('click', () => handleBuyUpgrade('cpuOverclock'));
-    buyUpgrade2Button?.addEventListener('click', () => handleBuyUpgrade('gpuMiner'));
+    buyUpgrade1Button?.addEventListener('click', () => handleBuyUpgrade('1')); // Use '1' for ID
+    buyUpgrade2Button?.addEventListener('click', () => handleBuyUpgrade('2')); // Use '2' for ID
     
     // Tab switching listeners
     document.querySelectorAll('.tab-button').forEach(button => {
@@ -783,6 +865,7 @@ export function initializeGame() {
     setupEventListeners();
 
     // 5. Initial calculations and render
+    applyTheme(); // <-- ADDED: Apply theme on initial load
     checkAdminStatus();
     updateCPS();
     switchTab(gameState.activeTab); 
