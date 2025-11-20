@@ -550,7 +550,7 @@ function handleRedeemCode() {
         codeMessageDisplay.classList.remove('text-green-400', 'text-red-400', 'text-yellow-500');
     }
     
-    if (code === 'SECRET') {
+    if (code === 'KAITLYNCLARK') {
         if (gameMode === 'pencil') {
             if (codeMessageDisplay) {
                 codeMessageDisplay.textContent = 'Pencil Clicker is already active!';
