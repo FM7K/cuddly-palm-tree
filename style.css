@@ -36,3 +36,129 @@
         .upgrade-list::-webkit-scrollbar-thumb:hover {
             background: #64748b; /* Slate 500 */
         }
+
+        
+        /* --- START: PENCIL MODE THEME (Black & Yellowish-Orange) --- */
+        /* This theme activates when the <body> tag has the .pencil-mode class */
+
+        /* Body and Main Containers */
+        .pencil-mode.bg-slate-800 {
+            background-color: #18181b; /* zinc-900 (near black) */
+        }
+
+        /* Header and Clicker Area */
+        .pencil-mode .bg-slate-900 {
+            background-color: #000000; /* black */
+        }
+
+        /* Borders */
+        .pencil-mode .border-slate-700 {
+            border-color: #3f3f46; /* zinc-700 */
+        }
+        .pencil-mode .border-slate-600 {
+            border-color: #52525b; /* zinc-600 */
+        }
+
+        /* Main Accent Text (like Title) */
+        .pencil-mode .text-indigo-400 {
+            color: #eab308; /* yellow-500 */
+        }
+
+        /* Clicker Button */
+        .pencil-mode #clicker-button {
+            background-color: #eab308; /* yellow-500 */
+            color: #000000; /* black text */
+        }
+        .pencil-mode #clicker-button:hover {
+            background-color: #f59e0b; /* amber-500 */
+        }
+        .pencil-mode #clicker-button:active {
+            background-color: #d97706; /* amber-600 */
+        }
+
+        /* Click Count */
+        .pencil-mode .text-green-400 {
+            color: #f59e0b; /* amber-500 */
+        }
+
+        /* Tab Panel Titles (Upgrades, Stats, etc.) */
+        .pencil-mode .text-sky-400 {
+            color: #eab308; /* yellow-500 */
+        }
+
+        /* Upgrade Panel Cards */
+        .pencil-mode .bg-slate-700 {
+            background-color: #27272a; /* zinc-800 */
+        }
+
+        /* Upgrade Titles */
+        .pencil-mode .text-emerald-400 {
+            color: #eab308; /* yellow-500 */
+        }
+        /* This targets the 'GPU Miner' and 'Stats-CPS' text */
+        .pencil-mode .text-yellow-400,
+        .pencil-mode .text-amber-400 {
+            color: #f59e0b; /* amber-500 */
+        }
+
+        /* Buy Buttons */
+        .pencil-mode #buy-upgrade-1,
+        .pencil-mode #buy-upgrade-2 {
+            background-color: #eab308; /* yellow-500 */
+            color: #000000; /* black text */
+        }
+        .pencil-mode #buy-upgrade-1:hover,
+        .pencil-mode #buy-upgrade-2:hover {
+            background-color: #f59e0b; /* amber-500 */
+        }
+        .pencil-mode #buy-upgrade-1:disabled,
+        .pencil-mode #buy-upgrade-2:disabled {
+            background-color: #3f3f46; /* zinc-700 */
+            color: #71717a; /* zinc-500 */
+        }
+
+
+        /* Options Panel */
+        .pencil-mode #mode-switch-area .text-indigo-400 {
+            color: #eab308; /* yellow-500 */
+        }
+        .pencil-mode #switch-to-crypto-button {
+            background-color: #eab308; /* yellow-500 */
+            color: #000000;
+        }
+        .pencil-mode #switch-to-crypto-button:hover {
+            background-color: #f59e0b; /* amber-500 */
+        }
+
+        /* Admin/Redeem Panel */
+        .pencil-mode .text-red-400 {
+            color: #f59e0b; /* amber-500 */
+        }
+        .pencil-mode .text-red-300 {
+            color: #eab308; /* yellow-500 */
+        }
+        .pencil-mode .bg-red-600 {
+            background-color: #eab308; /* yellow-500 */
+            color: #000000;
+        }
+        .pencil-mode .bg-red-600:hover {
+            background-color: #f59e0b; /* amber-500 */
+        }
+
+        /* Reset Button */
+        .pencil-mode .bg-yellow-600 {
+            background-color: #eab308; /* yellow-500 */
+            color: #000000;
+        }
+        .pencil-mode .bg-yellow-600:hover {
+            background-color: #f59e0b; /* amber-500 */
+        }
+
+        /* Input Fields */
+        .pencil-mode .bg-slate-800 {
+            background-color: #3f3f46; /* zinc-700 */
+        }
+        .pencil-mode .focus\:ring-red-500:focus {
+            --tw-ring-color: #eab308 !important; /* yellow-500 */
+        }
+        /* --- END: PENCIL MODE THEME --- */
