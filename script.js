@@ -18,7 +18,7 @@ const UPGRADE_CONFIGS = {
         clickButtonText: "Mine!",
         upgrade1: { 
             name: "CPU Overclock", 
-            description: "Increases clicks per manual click (CPC) by 1.", 
+            description: "Increases clicks per manual click (CP) by 1.", 
             cpcBonus: 1, 
             cpsBonus: 0 
         },
@@ -30,11 +30,11 @@ const UPGRADE_CONFIGS = {
         }
     },
     pencil: {
-        title: "PENCIL CLICKER",
-        clickButtonText: "Write!",
+        title: "TITUS CLICKER",
+        clickButtonText: "GOON!",
         upgrade1: { 
-            name: "Sharpen Pencil", 
-            description: "Increases clicks per manual click (CPC) by 1 (sharper point!).", 
+            name: "Sharpen Dih", 
+            description: "Increases clicks per manual click (CP) by 1 (sharper point!).", 
             cpcBonus: 1, 
             cpsBonus: 0 
         },
@@ -82,6 +82,8 @@ let gameTitleEl = null; // New element reference
 let clicksDisplay = null;
 let cpcDisplay = null;
 let clickerButton = null;
+let clickerButtonText = null; // NEW: Reference to the text span
+let clickerButtonImage = null; // NEW: Reference to the image element
 let modeSwitchArea = null; // New element reference
 let currentModeDisplay = null; // New element reference
 let switchToCryptoButton = null; // New element reference
@@ -192,13 +194,23 @@ function saveGame() {
 }
 
 /**
- * NEW: Applies the correct theme class to the <body> element based on the current gameMode.
+ * Applies the correct theme class to the <body> element based on the current gameMode.
  */
 function applyTheme() {
     if (gameMode === 'pencil') {
         document.body.classList.add('pencil-mode');
+        // Change button shape to rounded rectangle
+        if (clickerButton) {
+            clickerButton.classList.remove('clicker-button-round');
+            clickerButton.classList.add('clicker-button-rounded');
+        }
     } else {
         document.body.classList.remove('pencil-mode');
+        // Change button shape back to circle
+        if (clickerButton) {
+            clickerButton.classList.remove('clicker-button-rounded');
+            clickerButton.classList.add('clicker-button-round');
+        }
     }
 }
 
@@ -227,10 +239,10 @@ function switchGameMode(newMode) {
     // 4. Update the game title and button text
     const config = UPGRADE_CONFIGS[gameMode];
     if (gameTitleEl) gameTitleEl.textContent = config.title;
-    if (clickerButton) clickerButton.textContent = config.clickButtonText;
+    if (clickerButtonText) clickerButtonText.textContent = config.clickButtonText;
 
     // 5. Update UI and logic
-    applyTheme(); // <-- ADDED: Apply the new theme
+    applyTheme();
     checkAdminStatus(); // Check if admin panel is unlocked in the new mode
     updateUpgradeDisplay(); // Update upgrade names/descriptions
     updateCPS(); // Recalculate stats based on new mode's loaded levels
@@ -397,7 +409,7 @@ function renderUI() {
 
     // --- 0. Update Mode-Specific UI ---
     if (gameTitleEl) gameTitleEl.textContent = config.title;
-    if (clickerButton) clickerButton.textContent = config.clickButtonText;
+    if (clickerButtonText) clickerButtonText.textContent = config.clickButtonText;
 
     // Show/Hide the mode switch button based on mode
     if (modeSwitchArea) {
@@ -553,14 +565,14 @@ function handleRedeemCode() {
     if (code === 'KAITLYNCLARK') {
         if (gameMode === 'pencil') {
             if (codeMessageDisplay) {
-                codeMessageDisplay.textContent = 'Pencil Clicker is already active!';
+                codeMessageDisplay.textContent = 'Titus Clicker is already active!';
                 codeMessageDisplay.classList.add('text-red-400');
             }
         } else {
             // CRITICAL: Switch to the secret mode
             switchGameMode('pencil');
             if (codeMessageDisplay) {
-                codeMessageDisplay.textContent = 'SECRET CODE accepted! Welcome to PENCIL CLICKER!';
+                codeMessageDisplay.textContent = 'SECRET CODE accepted! Welcome to TITUS CLICKER!';
                 codeMessageDisplay.classList.add('text-green-400');
             }
             codeInput.value = '';
@@ -622,7 +634,7 @@ function handleSwitchToCrypto() {
             codeMessageDisplay.textContent = 'Welcome back to Crypto Clicker!';
             codeMessageDisplay.classList.add('text-green-400');
         } else {
-            codeMessageDisplay.textContent = 'Switched to Pencil Clicker!';
+            codeMessageDisplay.textContent = 'Switched to Titus Clicker!';
             codeMessageDisplay.classList.add('text-green-400');
         }
     }
@@ -719,7 +731,7 @@ function handleAdminSetCPC() {
     if (value !== null) {
         gameState.cpc = value;
         gameState.isCpcOverridden = true; // Activate override
-        showAdminSuccess(adminMsgCpc, `Click Power (CPC) set to ${value.toLocaleString()}.`);
+        showAdminSuccess(adminMsgCpc, `Click Power (CP) set to ${value.toLocaleString()}.`);
         renderUI();
         saveGame();
     }
@@ -741,7 +753,7 @@ function handleAdminSetCpuLevel() {
     if (value !== null) {
         gameState.upgrades.cpuOverclock.level = value;
         gameState.isCpcOverridden = false; // Deactivate override
-        showAdminSuccess(adminMsgCpuLevel, `CPC Level set to ${value}. Recalculating CPC...`);
+        showAdminSuccess(adminMsgCpuLevel, `CP Level set to ${value}. Recalculating CP...`);
         updateCPS(); // Recalculate stats
         renderUI();
         saveGame();
@@ -769,6 +781,8 @@ function assignDOMElements() {
     clicksDisplay = document.getElementById('clicks-display');
     cpcDisplay = document.getElementById('cpc-display');
     clickerButton = document.getElementById('clicker-button');
+    clickerButtonText = document.getElementById('clicker-button-text'); // NEW
+    clickerButtonImage = document.getElementById('clicker-button-image'); // NEW
     
     // Mode Switch Area
     modeSwitchArea = document.getElementById('mode-switch-area');
@@ -832,7 +846,7 @@ function setupEventListeners() {
         });
     });
 
-    // Code and Reset listeners
+    // Code and Reset
     redeemCodeButton?.addEventListener('click', handleRedeemCode);
     document.getElementById('reset-data-button')?.addEventListener('click', handleResetGame);
     
@@ -865,7 +879,7 @@ export function initializeGame() {
     setupEventListeners();
 
     // 5. Initial calculations and render
-    applyTheme(); // <-- ADDED: Apply theme on initial load
+    applyTheme();
     checkAdminStatus();
     updateCPS();
     switchTab(gameState.activeTab); 
