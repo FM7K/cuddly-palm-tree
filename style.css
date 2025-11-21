@@ -1,4 +1,4 @@
-      body {
+body {
             font-family: 'Inter', sans-serif;
             background-color: #0f172a; /* Slate 900 */
             color: #e2e8f0; /* Slate 200 */
@@ -19,6 +19,42 @@
         #clicker-button:active {
             transform: scale(0.98);
             box-shadow: 0 5px 10px -3px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* NEW: Clicker button shape variants */
+        .clicker-button-round {
+            border-radius: 9999px; /* Full circle for crypto mode */
+        }
+
+        .clicker-button-rounded {
+            border-radius: 1.5rem; /* Rounded corners for pencil mode */
+        }
+
+        /* NEW: Control visibility of text vs image in clicker button */
+        .clicker-text {
+            display: block;
+        }
+
+        .clicker-image {
+            display: none;
+        }
+
+        /* NEW: Pencil mode shows image, hides text */
+        .pencil-mode .clicker-text {
+            display: none;
+        }
+
+        .pencil-mode .clicker-image {
+            display: block;
+        }
+
+        /* NEW: Make clicker button responsive in pencil mode */
+        .pencil-mode #clicker-button {
+            width: 90%;
+            max-width: 600px;
+            height: auto;
+            aspect-ratio: 3 / 2; /* Maintains the 600x400 ratio */
+            padding: 0;
         }
 
         /* Custom scrollbar for the upgrades panel */
@@ -61,16 +97,16 @@
 
         /* Main Accent Text (like Title) */
         .pencil-mode .text-indigo-400 {
-            color: #eab308; /* yellow-500 */
+            color: #f59e0b; /* amber-500 */
         }
 
         /* Clicker Button */
         .pencil-mode #clicker-button {
-            background-color: #eab308; /* yellow-500 */
+            background-color: #f59e0b; /* amber-500 */
             color: #000000; /* black text */
         }
         .pencil-mode #clicker-button:hover {
-            background-color: #f59e0b; /* amber-500 */
+            background-color: #d97706; /* amber-600 */
         }
         .pencil-mode #clicker-button:active {
             background-color: #d97706; /* amber-600 */
@@ -78,12 +114,12 @@
 
         /* Click Count */
         .pencil-mode .text-green-400 {
-            color: #f59e0b; /* amber-500 */
+            color: #d97706; /* amber-600 */
         }
 
         /* Tab Panel Titles (Upgrades, Stats, etc.) */
         .pencil-mode .text-sky-400 {
-            color: #eab308; /* yellow-500 */
+            color: #f59e0b; /* amber-500 */
         }
 
         /* Upgrade Panel Cards */
@@ -93,23 +129,23 @@
 
         /* Upgrade Titles */
         .pencil-mode .text-emerald-400 {
-            color: #eab308; /* yellow-500 */
+            color: #f59e0b; /* amber-500 */
         }
         /* This targets the 'GPU Miner' and 'Stats-CPS' text */
         .pencil-mode .text-yellow-400,
         .pencil-mode .text-amber-400 {
-            color: #f59e0b; /* amber-500 */
+            color: #d97706; /* amber-600 */
         }
 
         /* Buy Buttons */
         .pencil-mode #buy-upgrade-1,
         .pencil-mode #buy-upgrade-2 {
-            background-color: #eab308; /* yellow-500 */
+            background-color: #f59e0b; /* amber-500 */
             color: #000000; /* black text */
         }
         .pencil-mode #buy-upgrade-1:hover,
         .pencil-mode #buy-upgrade-2:hover {
-            background-color: #f59e0b; /* amber-500 */
+            background-color: #d97706; /* amber-600 */
         }
         .pencil-mode #buy-upgrade-1:disabled,
         .pencil-mode #buy-upgrade-2:disabled {
@@ -120,38 +156,38 @@
 
         /* Options Panel */
         .pencil-mode #mode-switch-area .text-indigo-400 {
-            color: #eab308; /* yellow-500 */
+            color: #f59e0b; /* amber-500 */
         }
         .pencil-mode #switch-to-crypto-button {
-            background-color: #eab308; /* yellow-500 */
+            background-color: #f59e0b; /* amber-500 */
             color: #000000;
         }
         .pencil-mode #switch-to-crypto-button:hover {
-            background-color: #f59e0b; /* amber-500 */
+            background-color: #d97706; /* amber-600 */
         }
 
         /* Admin/Redeem Panel */
         .pencil-mode .text-red-400 {
-            color: #f59e0b; /* amber-500 */
+            color: #d97706; /* amber-600 */
         }
         .pencil-mode .text-red-300 {
-            color: #eab308; /* yellow-500 */
+            color: #f59e0b; /* amber-500 */
         }
         .pencil-mode .bg-red-600 {
-            background-color: #eab308; /* yellow-500 */
+            background-color: #f59e0b; /* amber-500 */
             color: #000000;
         }
         .pencil-mode .bg-red-600:hover {
-            background-color: #f59e0b; /* amber-500 */
+            background-color: #d97706; /* amber-600 
         }
 
         /* Reset Button */
         .pencil-mode .bg-yellow-600 {
-            background-color: #eab308; /* yellow-500 */
+            background-color: #f59e0b; /* amber-500 */
             color: #000000;
         }
         .pencil-mode .bg-yellow-600:hover {
-            background-color: #f59e0b; /* amber-500 */
+            background-color: #d97706; /* amber-600 */
         }
 
         /* Input Fields */
@@ -159,6 +195,6 @@
             background-color: #3f3f46; /* zinc-700 */
         }
         .pencil-mode .focus\:ring-red-500:focus {
-            --tw-ring-color: #eab308 !important; /* yellow-500 */
+            --tw-ring-color: #f59e0b !important; /* amber-500 */
         }
         /* --- END: PENCIL MODE THEME --- */
