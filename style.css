@@ -49,13 +49,12 @@ body {
         }
 
         /* NEW: Make clicker button responsive in pencil mode */
-        /* FIND SKIBIDI */
         .pencil-mode #clicker-button {
-          width: 400px;
-          max-width: 90vw;
-          height: 400px;
-          max-height: 90vw;
-          aspect-ratio: 1 / 1; /* Square ratio */
+            width: 400px;
+           max-width: 90vw;
+            height: 400px;
+           max-height: 90vw;
+           aspect-ratio: 1 / 1; /* Square ratio */
            padding: 0;
         }
 
