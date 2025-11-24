@@ -44,17 +44,17 @@ body {
             display: none;
         }
 
-        .pencil-mode .clicker-image {
-            display: block;
+       .pencil-mode .clicker-image {
+          display: block;
+          border-radius: 0.75rem; /* Match the button's rounded corners */
         }
+
 
         /* NEW: Make clicker button responsive in pencil mode */
         .pencil-mode #clicker-button {
-            width: 400px;
-           max-width: 90vw;
-            height: 400px;
-           max-height: 90vw;
-           aspect-ratio: 1 / 1; /* Square ratio */
+            width: min(400px, 90vw);
+           height: min(400px, 90vw);
+            aspect-ratio: 1 / 1; /* Square ratio */
            padding: 0;
         }
 
