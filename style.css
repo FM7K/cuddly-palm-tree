@@ -27,7 +27,7 @@ body {
         }
 
         .clicker-button-rounded {
-            border-radius: 1.5rem; /* Rounded corners for pencil mode */
+            border-radius: 0.5rem; /* Rounded corners for pencil mode */
         }
 
         /* NEW: Control visibility of text vs image in clicker button */
@@ -49,12 +49,14 @@ body {
         }
 
         /* NEW: Make clicker button responsive in pencil mode */
+        /* FIND SKIBIDI */
         .pencil-mode #clicker-button {
-            width: 90%;
-            max-width: 600px;
-            height: auto;
-            aspect-ratio: 3 / 2; /* Maintains the 600x400 ratio */
-            padding: 0;
+          width: 400px;
+          max-width: 90vw;
+          height: 400px;
+          max-height: 90vw;
+          aspect-ratio: 1 / 1; /* Square ratio */
+           padding: 0;
         }
 
         /* Custom scrollbar for the upgrades panel */
